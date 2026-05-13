@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     IonHeader, IonToolbar, IonTitle, IonContent,
-    IonItem, IonInput, IonButton, IonText,
+    IonItem, IonInput, IonButton,
     IonSegment, IonSegmentButton, IonLabel,
     FormsModule, CommonModule
   ]
