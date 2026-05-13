@@ -108,11 +108,29 @@ doc.add_paragraph(
 )
 items = [
     "Puerto 22 (SSH): acceso solo con clave privada (.pem)",
-    "Puerto 80 (HTTP): abierto al público para la aplicación web",
+    "Puerto 80 (HTTP): redirige a HTTPS",
+    "Puerto 443 (HTTPS): abierto al público para la aplicación web con SSL",
     "Puerto 3306 (MySQL): cerrado (solo acceso local desde la VM)",
 ]
 for item in items:
     doc.add_paragraph(item, style='List Bullet')
+
+doc.add_heading("3.3 Configuración de HTTPS", level=2)
+doc.add_paragraph(
+    "Se generó un certificado SSL autofirmado y se configuró Apache para servir "
+    "la aplicación exclusivamente sobre HTTPS en el puerto 443:"
+)
+doc.add_paragraph(
+    "sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \\\n"
+    "-keyout /etc/ssl/private/intercagram.key \\\n"
+    "-out /etc/ssl/certs/intercagram.crt \\\n"
+    "-subj '/CN=20.151.96.66'", style='Quote'
+)
+doc.add_paragraph(
+    "Se creó el VirtualHost intercagram-ssl.conf en Apache con SSLEngine on, "
+    "apuntando a /var/www/html/intercagram/public como DocumentRoot. "
+    "El tráfico HTTP (puerto 80) se redirige automáticamente a HTTPS mediante Redirect permanent."
+)
 
 # ---- 4. PROCESO DE DESPLIEGUE ----
 doc.add_heading("4. Proceso de Despliegue", level=1)
@@ -167,10 +185,90 @@ steps2 = [
 for s in steps2:
     doc.add_paragraph(s, style='List Bullet')
 
+doc.add_heading("4.6 Configuración de HTTPS en Apache", level=2)
+doc.add_paragraph(
+    "Se implementó HTTPS en la aplicación mediante un certificado SSL autofirmado:"
+)
+steps3 = [
+    "Generación de certificado SSL autofirmado con OpenSSL (RSA 2048, validez 365 días)",
+    "Creación del VirtualHost intercagram-ssl.conf en Apache con SSLEngine on",
+    "Configuración del DocumentRoot en /var/www/html/intercagram/public",
+    "Apertura del puerto 443 en el NSG de Azure",
+    "Redirección automática de HTTP a HTTPS mediante Redirect permanent",
+    "Actualización de APP_URL en .env del backend a https://20.151.96.66",
+]
+for s in steps3:
+    doc.add_paragraph(s, style='List Bullet')
+
+doc.add_heading("4.7 Implementación de Cámara WebRTC", level=2)
+doc.add_paragraph(
+    "Se implementó la captura de fotos directamente desde la cámara del dispositivo "
+    "utilizando la API WebRTC (getUserMedia), reemplazando el <input capture='environment'> "
+    "que solo funcionaba en dispositivos móviles:"
+)
+steps4 = [
+    "Creación de vista previa en vivo (video tag) con stream de getUserMedia",
+    "Botón de captura que toma una foto del video y la dibuja en un canvas",
+    "Botón de volteo de cámara (facingMode: 'user' ↔ 'environment') para cámara frontal/posterior",
+    "Efecto espejo en la vista previa de la cámara frontal mediante transform: scaleX(-1)",
+    "Opción alternativa 'Elegir archivo' con <input type='file'> para subir imágenes existentes",
+    "Guardia de doble clic: bandera uploading que deshabilita el botón y muestra 'Publicando...'",
+    "Toast de confirmación verde al crear publicación ('Publicación creada', 1.5 segundos)",
+    "Navegación automática al feed tras publicación exitosa",
+]
+for s in steps4:
+    doc.add_paragraph(s, style='List Bullet')
+
+doc.add_heading("4.8 Corrección de Error 500 en Autenticación", level=2)
+doc.add_paragraph(
+    "Se solucionó un error crítico que causaba una respuesta HTTP 500 en lugar de 401 "
+    "cuando un usuario no autenticado intentaba acceder a rutas protegidas de la API:"
+)
+doc.add_paragraph(
+    "La causa era que Laravel intentaba redirigir a una ruta llamada 'login' (propia de "
+    "aplicaciones web con sesiones), inexistente en una API stateless. Se agregó un callback "
+    "en bootstrap/app.php que retorna null para rutas API, permitiendo que la excepción "
+    "AuthenticationException se maneje correctamente con un response JSON 401:"
+)
+doc.add_paragraph(
+    "->withRouting(\n"
+    "    api: __DIR__.'/../routes/api.php',\n"
+    "    then: function () {\n"
+    "        RedirectIfAuthenticated::redirectUsing(fn () => null);\n"
+    "    },\n"
+    ")", style='Quote'
+)
+doc.add_paragraph(
+    "Además se agregó un renderizador personalizado para AuthenticationException que "
+    "retorna status 401 con mensaje 'Unauthenticated' en formato JSON."
+)
+
+doc.add_heading("4.9 Migración de URLs de HTTP a HTTPS", level=2)
+doc.add_paragraph(
+    "Todas las URLs del frontend Ionic/Angular se actualizaron de HTTP a HTTPS para "
+    "evitar errores de contenido mixto (Mixed Content) y permitir el acceso a la cámara "
+    "(getUserMedia requiere contexto seguro - HTTPS):"
+)
+steps5 = [
+    "api.ts: baseURL cambiado de http://20.151.96.66/api/ a https://20.151.96.66/api/",
+    "auth.ts: URL de autenticación actualizada a https://20.151.96.66/api/",
+    "feed.page.ts: imageBaseUrl cambiado a https://20.151.96.66/storage/",
+    "friends.page.ts: imageBaseUrl cambiado a https://20.151.96.66/storage/",
+    ".env del backend: APP_URL actualizado a https://20.151.96.66",
+]
+for s in steps5:
+    doc.add_paragraph(s, style='List Bullet')
+
+doc.add_heading("4.10 Limpieza de Publicaciones Duplicadas", level=2)
+doc.add_paragraph(
+    "Se identificaron y eliminaron 4 publicaciones duplicadas (IDs 13-16) en la base de datos "
+    "MySQL, que fueron generadas durante pruebas de la funcionalidad de cámara y carga de imágenes."
+)
+
 # ---- 5. ENDPOINTS API ----
 doc.add_heading("5. Endpoints de la API", level=1)
 doc.add_paragraph(
-    "La API REST expone los siguientes endpoints, todos accesibles desde http://20.151.96.66/api/:"
+    "La API REST expone los siguientes endpoints, todos accesibles desde https://20.151.96.66/api/:"
 )
 
 endpoints = [
@@ -228,9 +326,18 @@ test_data = [
     ('POST /api/register', 'Crea usuario y devuelve token'),
     ('POST /api/login', 'Autentica y devuelve token'),
     ('GET /api', 'JSON con documentación de endpoints'),
-    ('GET /app/', 'Frontend Ionic carga correctamente'),
+    ('GET /app/', 'Frontend Ionic carga correctamente sobre HTTPS'),
     ('GET /app/login', 'Ruteo Angular funciona'),
     ('GET /storage/posts/*', 'Imágenes se sirven correctamente'),
+    ('GET https://20.151.96.66/api/me (sin token)', '401 Unauthenticated (JSON)'),
+    ('GET https://20.151.96.66/api/me (con token)', '200 OK, datos del usuario'),
+    ('GET https://20.151.96.66/api/posts', '200 OK, feed de publicaciones'),
+    ('POST https://20.151.96.66/api/posts', '201 Created con imagen'),
+    ('GET https://20.151.96.66/api/friends', '200 OK, lista de amigos'),
+    ('Cámara WebRTC (getUserMedia)', 'Stream de video en vivo, captura y carga'),
+    ('Doble clic en Publicar', 'Segundo clic bloqueado, muestra "Publicando..."'),
+    ('Toast de confirmación', 'Mensaje verde "Publicación creada" 1.5s, navega a /feed'),
+    ('Redirección HTTP→HTTPS', 'http://20.151.96.66 redirige a https://20.151.96.66'),
 ]
 
 table4 = doc.add_table(rows=len(test_data), cols=2)
@@ -277,13 +384,28 @@ doc.add_paragraph(
     "5. La aplicación es funcional al 100%: registro, login, publicaciones con imágenes, "
     "likes, comentarios y gestión de amistades."
 )
+doc.add_paragraph(
+    "6. Se implementó HTTPS con certificado SSL autofirmado, garantizando comunicación "
+    "cifrada entre el cliente y el servidor. Esto permitió habilitar la API getUserMedia "
+    "para acceso a la cámara desde el navegador."
+)
+doc.add_paragraph(
+    "7. La cámara WebRTC funciona correctamente en dispositivos móviles y de escritorio, "
+    "con soporte para cámara frontal y posterior, vista previa en vivo, y guardia de doble "
+    "clic para evitar publicaciones duplicadas."
+)
+doc.add_paragraph(
+    "8. Se corrigió el error de autenticación que retornaba HTTP 500 en lugar de 401, "
+    "implementando el manejo correcto de AuthenticationException para APIs stateless."
+)
 
 doc.add_paragraph()
 
 # ---- URLs de acceso ----
 doc.add_heading("Anexo: URLs de Acceso", level=1)
-doc.add_paragraph(f"Frontend Web: http://20.151.96.66/app/")
-doc.add_paragraph(f"API Root: http://20.151.96.66/api/")
+doc.add_paragraph(f"Frontend Web: https://20.151.96.66/app/")
+doc.add_paragraph(f"API Root: https://20.151.96.66/api/")
+doc.add_paragraph(f"Nota: HTTP (puerto 80) redirige automáticamente a HTTPS (puerto 443).")
 doc.add_paragraph(f"Repositorio GitHub: https://github.com/HYNR24/intercagram")
 
 # Save
