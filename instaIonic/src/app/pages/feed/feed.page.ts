@@ -31,7 +31,7 @@ export class FeedPage implements OnInit {
 
   posts: any[] = [];
   storyUsers: any[] = [];
-  base = 'http://20.151.96.66/storage/';
+  base = 'https://20.151.96.66/storage/';
 
   selectedPost: any = null;
   newComment = '';
