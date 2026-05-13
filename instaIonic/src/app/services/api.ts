@@ -85,4 +85,20 @@ export class Api {
     return this.http.get<any[]>(this.apiUrl + `users/${username}/posts`, this.authHeaders());
   }
 
+  likeComment(commentId: number) {
+    return this.http.post(this.apiUrl + `comments/${commentId}/like`, {}, this.authHeaders());
+  }
+
+  unlikeComment(commentId: number) {
+    return this.http.delete(this.apiUrl + `comments/${commentId}/like`, this.authHeaders());
+  }
+
+  cancelFriendRequest(username: string) {
+    return this.http.delete(this.apiUrl + `users/${username}/friend/cancel`, this.authHeaders());
+  }
+
+  getFriendshipStatus(username: string) {
+    return this.http.get(this.apiUrl + `users/${username}/friend/status`, this.authHeaders());
+  }
+
 }

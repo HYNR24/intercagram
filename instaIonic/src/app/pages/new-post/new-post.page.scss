@@ -1,3 +1,7 @@
+ion-header ion-toolbar {
+  --border-width: 0;
+}
+
 .camera-view {
   position: relative;
   width: 100%;
@@ -33,4 +37,36 @@
   height: 64px;
   --padding-start: 0;
   --padding-end: 0;
+}
+
+.action-grid {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.action-grid ion-button {
+  flex: 1;
+  --border-radius: 8px;
+  text-transform: none;
+  font-weight: 500;
+  font-size: 13px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+}
+
+.caption-input {
+  --background: #fff;
+  --border-radius: 8px;
+  --padding-start: 12px;
+  margin-bottom: 8px;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+}
+
+.preview-img {
+  margin-top: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }

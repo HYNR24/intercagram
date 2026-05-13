@@ -30,6 +30,10 @@ ion-button ion-icon {
   font-size: 22px;
 }
 
+ion-content {
+  --background: #fafafa;
+}
+
 /* ========== STORIES BAR ========== */
 .stories-bar {
   display: flex;
@@ -92,13 +96,20 @@ ion-button ion-icon {
   border-bottom: 1px solid #efefef;
 }
 
+.search-section ion-searchbar {
+  --border-radius: 8px;
+  --box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  padding: 0;
+}
+
 .search-results {
   background: #fff;
   border: 1px solid #dbdbdb;
   border-radius: 8px;
-  margin-top: 2px;
-  max-height: 260px;
+  margin-top: 4px;
+  max-height: 300px;
   overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .search-item {
@@ -106,16 +117,37 @@ ion-button ion-icon {
   --min-height: 48px;
 }
 
+.search-item h2 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.search-item p {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.search-loading {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
 /* ========== FEED ========== */
 .feed-container {
   width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 12px;
 }
 
 /* ========== POST CARD ========== */
 .post-card {
   background: #fff;
-  border-bottom: 1px solid #efefef;
-  margin-bottom: 0;
+  margin: 8px 0;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  overflow: hidden;
 }
 
 .post-header {
@@ -239,15 +271,52 @@ ion-button ion-icon {
 }
 
 .comment-item {
-  padding: 6px 0;
+  padding: 8px 0;
   font-size: 13px;
   color: #262626;
   line-height: 1.4;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.comment-item:last-child {
+  border-bottom: none;
 }
 
 .comment-item strong {
   font-weight: 600;
   margin-right: 4px;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.comment-likes-count {
+  font-size: 11px;
+  color: #8e8e8e;
+  margin-right: 2px;
+}
+
+.comment-like-btn {
+  --padding-start: 4px;
+  --padding-end: 4px;
+  margin: 0;
+  --min-height: 24px;
+  height: 24px;
+}
+
+.comment-like-btn ion-icon {
+  font-size: 14px;
 }
 
 .no-comments {

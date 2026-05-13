@@ -115,15 +115,27 @@ export class NewPostPage {
     this.api.createPost(this.file, this.caption).subscribe({
       next: async () => {
         const t = await this.toast.create({
-          message: 'Publicación creada',
+          message: 'Imagen publicada',
           duration: 1500,
           color: 'success',
           position: 'bottom'
         });
         await t.present();
-        setTimeout(() => this.router.navigateByUrl('/feed'), 1500);
+        this.caption = '';
+        this.file = undefined;
+        this.preview = undefined;
+        setTimeout(() => this.router.navigateByUrl('/feed', { replaceUrl: true }), 1000);
       },
-      error: () => this.uploading = false
+      error: async () => {
+        this.uploading = false;
+        const t = await this.toast.create({
+          message: 'Error al publicar. Intenta de nuevo.',
+          duration: 2000,
+          color: 'danger',
+          position: 'bottom'
+        });
+        await t.present();
+      }
     });
   }
 

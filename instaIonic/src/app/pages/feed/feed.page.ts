@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonItem, IonAvatar, IonLabel, IonButton, IonButtons,
-  IonInput, IonIcon, IonSearchbar
+  IonInput, IonIcon, IonSearchbar, IonSpinner
 } from '@ionic/angular/standalone';
 import {
   cameraOutline, heartOutline, heart,
   chatbubbleOutline, paperPlaneOutline,
   personAdd, closeOutline, searchOutline,
-  chevronBackOutline, chevronForwardOutline
+  chevronBackOutline, chevronForwardOutline,
+  checkmarkCircle, personRemove
 } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Api } from '../../services/api';
@@ -22,7 +23,7 @@ import { Auth } from '../../services/auth';
   styleUrls: ['./feed.page.scss'],
   standalone: true,
   imports: [
-    IonSearchbar, IonInput, IonHeader, IonToolbar, IonTitle, IonContent,
+    IonSpinner, IonSearchbar, IonInput, IonHeader, IonToolbar, IonTitle, IonContent,
     IonItem, IonAvatar, IonLabel, IonButton, IonButtons,
     FormsModule, CommonModule, IonIcon
   ]
@@ -47,8 +48,13 @@ export class FeedPage implements OnInit {
   viewerIndex = 0;
   showViewer = false;
   viewerProgress = 0;
+  viewerUserIdx = 0;
   private viewerTimer: any = null;
   private viewerInterval: any = null;
+
+  followLoading: { [key: string]: boolean } = {};
+  commentLikeLoading: { [key: number]: boolean } = {};
+  searchLoading = false;
 
   icons = {
     camera: cameraOutline,
@@ -61,7 +67,9 @@ export class FeedPage implements OnInit {
     person: personAdd,
     close: closeOutline,
     chevronBack: chevronBackOutline,
-    chevronForward: chevronForwardOutline
+    chevronForward: chevronForwardOutline,
+    checkmark: checkmarkCircle,
+    personRemove
   };
 
   constructor(
@@ -108,9 +116,37 @@ export class FeedPage implements OnInit {
   sendComment() {
     if (!this.selectedPost || !this.newComment.trim()) return;
     this.api.commentPost(this.selectedPost.id, this.newComment).subscribe(res => {
+      res.likes_count = 0;
+      res.liked_by_me = false;
       this.comments.unshift(res);
       this.newComment = '';
     });
+  }
+
+  toggleCommentLike(c: any) {
+    const id = c.id;
+    if (this.commentLikeLoading[id]) return;
+    this.commentLikeLoading[id] = true;
+
+    if (c.liked_by_me) {
+      this.api.unlikeComment(id).subscribe({
+        next: () => {
+          c.liked_by_me = false;
+          c.likes_count = Math.max(0, (c.likes_count || 0) - 1);
+          this.commentLikeLoading[id] = false;
+        },
+        error: () => this.commentLikeLoading[id] = false
+      });
+    } else {
+      this.api.likeComment(id).subscribe({
+        next: () => {
+          c.liked_by_me = true;
+          c.likes_count = (c.likes_count || 0) + 1;
+          this.commentLikeLoading[id] = false;
+        },
+        error: () => this.commentLikeLoading[id] = false
+      });
+    }
   }
 
   onSearchInput(ev: any) {
@@ -119,23 +155,46 @@ export class FeedPage implements OnInit {
       this.searchResults = [];
       return;
     }
-    this.api.searchUsers(q).subscribe(res => this.searchResults = res);
-  }
-
-  selectUser(user: any) {
-    this.friendUsername = user.username;
-    this.searchResults = [];
-    this.showSearch = false;
-  }
-
-  followUser(username: string) {
-    this.api.sendFriendRequest(username).subscribe(() => {});
-  }
-
-  unfollowUser(username: string) {
-    this.api.removeFriend(username).subscribe(() => {
-      this.load();
+    this.searchLoading = true;
+    this.api.searchUsers(q).subscribe({
+      next: res => {
+        this.searchResults = res;
+        this.searchLoading = false;
+      },
+      error: () => this.searchLoading = false
     });
+  }
+
+  toggleFollow(user: any) {
+    const username = user.profile?.username || user.username;
+    if (!username || this.followLoading[username]) return;
+    this.followLoading[username] = true;
+
+    if (user.friendship_status === 'none') {
+      this.api.sendFriendRequest(username).subscribe({
+        next: () => {
+          user.friendship_status = 'pending';
+          this.followLoading[username] = false;
+        },
+        error: () => this.followLoading[username] = false
+      });
+    } else if (user.friendship_status === 'pending') {
+      this.api.cancelFriendRequest(username).subscribe({
+        next: () => {
+          user.friendship_status = 'none';
+          this.followLoading[username] = false;
+        },
+        error: () => this.followLoading[username] = false
+      });
+    } else if (user.friendship_status === 'accepted') {
+      this.api.removeFriend(username).subscribe({
+        next: () => {
+          user.friendship_status = 'none';
+          this.followLoading[username] = false;
+        },
+        error: () => this.followLoading[username] = false
+      });
+    }
   }
 
   closeComments() {
@@ -158,19 +217,28 @@ export class FeedPage implements OnInit {
     });
   }
 
+  userIdxFromUsername(username: string): number {
+    return this.storyUsers.findIndex((u: any) => u.profile?.username === username);
+  }
+
   openUserPosts(p: any) {
     const username = p.user?.profile?.username;
-    if (username) this.viewUserPosts(username, p.id);
+    if (username) {
+      this.viewerUserIdx = this.userIdxFromUsername(username);
+      this.viewUserPosts(username, p.id);
+    }
   }
 
   viewUserPosts(username: string, focusPostId?: number) {
     this.api.getUserPosts(username).subscribe(posts => {
-      if (!posts.length) return;
-      this.viewerPosts = posts;
-      if (focusPostId != null) {
-        this.viewerIndex = posts.findIndex((x: any) => x.id === focusPostId);
+      if (!posts.length) {
+        this.tryNextUser();
+        return;
       }
-      if (this.viewerIndex < 0) this.viewerIndex = 0;
+      this.viewerPosts = posts;
+      this.viewerIndex = focusPostId != null
+        ? Math.max(0, posts.findIndex((x: any) => x.id === focusPostId))
+        : 0;
       this.showViewer = true;
       this.viewerProgress = 0;
       this.startViewerTimer();
@@ -181,7 +249,37 @@ export class FeedPage implements OnInit {
     this.showViewer = false;
     this.viewerPosts = [];
     this.viewerIndex = 0;
+    this.viewerUserIdx = 0;
     this.stopViewerTimer();
+  }
+
+  private tryNextUser() {
+    this.viewerUserIdx++;
+    if (this.viewerUserIdx < this.storyUsers.length) {
+      const nextUser = this.storyUsers[this.viewerUserIdx];
+      this.viewUserPosts(nextUser.profile?.username);
+    } else {
+      this.closeViewer();
+    }
+  }
+
+  private tryPrevUser() {
+    this.viewerUserIdx--;
+    if (this.viewerUserIdx >= 0) {
+      const prevUser = this.storyUsers[this.viewerUserIdx];
+      this.api.getUserPosts(prevUser.profile?.username).subscribe(posts => {
+        if (!posts.length) {
+          this.tryPrevUser();
+          return;
+        }
+        this.viewerPosts = posts;
+        this.viewerIndex = posts.length - 1;
+        this.viewerProgress = 0;
+        this.resetViewerTimer();
+      });
+    } else {
+      this.closeViewer();
+    }
   }
 
   prevPost() {
@@ -189,6 +287,8 @@ export class FeedPage implements OnInit {
       this.viewerIndex--;
       this.viewerProgress = 0;
       this.resetViewerTimer();
+    } else if (this.viewerUserIdx > 0) {
+      this.tryPrevUser();
     }
   }
 
@@ -197,6 +297,8 @@ export class FeedPage implements OnInit {
       this.viewerIndex++;
       this.viewerProgress = 0;
       this.resetViewerTimer();
+    } else if (this.viewerUserIdx < this.storyUsers.length - 1) {
+      this.tryNextUser();
     } else {
       this.closeViewer();
     }
@@ -228,6 +330,8 @@ export class FeedPage implements OnInit {
   private advanceOrClose() {
     if (this.viewerIndex < this.viewerPosts.length - 1) {
       this.viewerIndex++;
+    } else if (this.viewerUserIdx < this.storyUsers.length - 1) {
+      this.tryNextUser();
     } else {
       this.closeViewer();
     }
@@ -238,11 +342,17 @@ export class FeedPage implements OnInit {
   }
 
   get hasPrev() {
-    return this.viewerIndex > 0;
+    return this.viewerIndex > 0 || this.viewerUserIdx > 0;
   }
 
   get hasNext() {
-    return this.viewerIndex < this.viewerPosts.length - 1;
+    return this.viewerIndex < this.viewerPosts.length - 1 ||
+           this.viewerUserIdx < this.storyUsers.length - 1;
+  }
+
+  get viewerStoryUser() {
+    const post = this.currentViewerPost;
+    return post?.user;
   }
 
   @HostListener('document:keydown.escape')

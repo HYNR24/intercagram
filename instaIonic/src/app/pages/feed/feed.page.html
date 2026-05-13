@@ -46,6 +46,10 @@
       [showCancelButton]="'focus'"
     ></ion-searchbar>
 
+    <div class="search-loading" *ngIf="searchLoading">
+      <ion-spinner></ion-spinner>
+    </div>
+
     <div class="search-results" *ngIf="showSearch && searchResults.length > 0">
       <ion-item
         *ngFor="let u of searchResults"
@@ -60,9 +64,26 @@
           <h2>{{ u.profile?.username }}</h2>
           <p>{{ u.name }}</p>
         </ion-label>
-        <ion-button size="small" slot="end" (click)="followUser(u.profile?.username); $event.stopPropagation()">
-          Seguir
-        </ion-button>
+
+        <ng-container *ngIf="u.friendship_status !== 'self'">
+          <ion-button
+            size="small"
+            slot="end"
+            [disabled]="followLoading[u.profile?.username]"
+            [color]="u.friendship_status === 'accepted' ? 'success' : u.friendship_status === 'pending' ? 'warning' : 'primary'"
+            (click)="toggleFollow(u); $event.stopPropagation()"
+          >
+            <ion-spinner *ngIf="followLoading[u.profile?.username]" slot="start"></ion-spinner>
+            <ng-container [ngSwitch]="u.friendship_status">
+              <span *ngSwitchCase="'accepted'">
+                <ion-icon [icon]="icons.checkmark" slot="start"></ion-icon>
+                Amigos
+              </span>
+              <span *ngSwitchCase="'pending'">Enviada</span>
+              <span *ngSwitchDefault>Seguir</span>
+            </ng-container>
+          </ion-button>
+        </ng-container>
       </ion-item>
     </div>
   </div>
@@ -119,7 +140,25 @@
 
       <div class="comments-list">
         <div class="comment-item" *ngFor="let c of comments">
-          <strong>{{ c.user?.profile?.username }}</strong> {{ c.content }}
+          <div class="comment-content">
+            <strong>{{ c.user?.profile?.username }}</strong> {{ c.content }}
+          </div>
+          <div class="comment-actions">
+            <span class="comment-likes-count" *ngIf="c.likes_count > 0">{{ c.likes_count }}</span>
+            <ion-button
+              fill="clear"
+              size="small"
+              class="comment-like-btn"
+              [disabled]="commentLikeLoading[c.id]"
+              (click)="toggleCommentLike(c)"
+            >
+              <ion-icon
+                [icon]="c.liked_by_me ? icons.heartFilled : icons.heartOutline"
+                slot="icon-only"
+                [style.color]="c.liked_by_me ? '#ed4956' : '#8e8e8e'"
+              ></ion-icon>
+            </ion-button>
+          </div>
         </div>
         <div class="no-comments" *ngIf="comments.length === 0">
           No hay comentarios aún
@@ -158,9 +197,9 @@
 
       <div class="viewer-user">
         <ion-avatar class="viewer-avatar">
-          <img [src]="currentViewerPost.user?.profile?.avatar ? imgUrl(currentViewerPost.user.profile.avatar) : 'assets/icon/favicon.png'" />
+          <img [src]="viewerStoryUser?.profile?.avatar ? imgUrl(viewerStoryUser.profile.avatar) : 'assets/icon/favicon.png'" />
         </ion-avatar>
-        <span class="viewer-username">{{ currentViewerPost.user?.profile?.username }}</span>
+        <span class="viewer-username">{{ viewerStoryUser?.profile?.username }}</span>
       </div>
 
       <div class="viewer-body">

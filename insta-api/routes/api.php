@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CommentLikeController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\FriendshipController;
 
@@ -31,13 +32,16 @@ Route::get('/', function () {
                 'DELETE /api/posts/{id}/like'=> 'Quitar like (token requerido)',
             ],
             'comentarios' => [
-                'GET /api/posts/{id}/comments'  => 'Ver comentarios (token requerido)',
-                'POST /api/posts/{id}/comments' => 'Comentar (token requerido)',
+                'GET /api/posts/{id}/comments'       => 'Ver comentarios (token requerido)',
+                'POST /api/posts/{id}/comments'      => 'Comentar (token requerido)',
+                'POST /api/comments/{id}/like'       => 'Dar like a comentario (token requerido)',
+                'DELETE /api/comments/{id}/like'      => 'Quitar like a comentario (token requerido)',
             ],
             'amistades' => [
-                'GET /api/friends'              => 'Listar amigos (token requerido)',
-                'POST /api/users/{username}/friend' => 'Enviar solicitud (token requerido)',
+                'GET /api/friends'                   => 'Listar amigos (token requerido)',
+                'POST /api/users/{username}/friend'  => 'Enviar solicitud (token requerido)',
                 'DELETE /api/users/{username}/friend'=> 'Eliminar amigo (token requerido)',
+                'DELETE /api/users/{username}/friend/cancel' => 'Cancelar solicitud (token requerido)',
                 'POST /api/friendships/{id}/accept' => 'Aceptar solicitud (token requerido)',
                 'GET /api/friendships/pending'   => 'Solicitudes pendientes (token requerido)',
                 'GET /api/users/suggested'       => 'Usuarios sugeridos (token requerido)',
@@ -73,9 +77,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts/{post}/like', [LikeController::class, 'like']);
     Route::delete('/posts/{post}/like', [LikeController::class, 'unlike']);
 
+    // comment likes
+    Route::post('/comments/{comment}/like', [CommentLikeController::class, 'like']);
+    Route::delete('/comments/{comment}/like', [CommentLikeController::class, 'unlike']);
+
     // friendships
     Route::post('/users/{username}/friend', [FriendshipController::class, 'send']);
     Route::delete('/users/{username}/friend', [FriendshipController::class, 'remove']);
+    Route::delete('/users/{username}/friend/cancel', [FriendshipController::class, 'cancel']);
     Route::get('/friends', [FriendshipController::class, 'myFriends']);
     Route::post('/friendships/{friendship}/accept', [FriendshipController::class, 'accept']);
     Route::get('/friendships/pending', [FriendshipController::class, 'pending']);

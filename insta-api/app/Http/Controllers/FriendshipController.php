@@ -78,6 +78,24 @@ class FriendshipController extends Controller
             ->get();
     }
 
+    public function cancel(Request $request, $username)
+    {
+        $profile = Profile::where('username', $username)->first();
+
+        if (!$profile) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+
+        $friend = $profile->user;
+
+        Friendship::where('user_id', $request->user()->id)
+            ->where('friend_id', $friend->id)
+            ->where('status', 'pending')
+            ->delete();
+
+        return response()->json(['message' => 'Solicitud cancelada']);
+    }
+
     public function remove(Request $request, $username)
     {
         $profile = Profile::where('username', $username)->first();

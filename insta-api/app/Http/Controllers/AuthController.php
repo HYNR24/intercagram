@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Profile;
+use App\Models\Friendship;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -69,10 +70,29 @@ class AuthController extends Controller
     public function search(Request $request)
     {
         $query = $request->query('q', '');
+        $userId = $request->user()->id;
+
         $users = User::whereHas('profile', function ($q) use ($query) {
             $q->where('username', 'like', "%{$query}%");
         })->with('profile')->limit(10)->get();
 
-        return $users;
+        $friendIds = Friendship::where(function ($q) use ($userId) {
+            $q->where('user_id', $userId)->orWhere('friend_id', $userId);
+        })->get()->keyBy(function ($f) use ($userId) {
+            return $f->user_id === $userId ? $f->friend_id : $f->user_id;
+        });
+
+        return $users->map(function ($user) use ($friendIds, $userId) {
+            if ($user->id === $userId) {
+                $user->friendship_status = 'self';
+            } elseif ($friendIds->has($user->id)) {
+                $f = $friendIds->get($user->id);
+                $user->friendship_status = $f->status === 'accepted' ? 'accepted' : 'pending';
+                $user->friendship_id = $f->id;
+            } else {
+                $user->friendship_status = 'none';
+            }
+            return $user;
+        });
     }
 }

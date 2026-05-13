@@ -5,36 +5,36 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-segment [(ngModel)]="mode">
-    <ion-segment-button value="login">
-      <ion-label>Ingresar</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="register">
-      <ion-label>Registrar</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <div class="login-container">
+    <ion-segment [(ngModel)]="mode">
+      <ion-segment-button value="login">
+        <ion-label>Ingresar</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="register">
+        <ion-label>Registrar</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-  <div *ngIf="mode === 'register'">
+    <div *ngIf="mode === 'register'">
+      <ion-item>
+        <ion-input label="Nombre" [(ngModel)]="name"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Usuario" [(ngModel)]="username"></ion-input>
+      </ion-item>
+    </div>
+
     <ion-item>
-      <ion-input label="Nombre" [(ngModel)]="name"></ion-input>
+      <ion-input label="Email" type="email" [(ngModel)]="email"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-input label="Usuario" [(ngModel)]="username"></ion-input>
+      <ion-input label="Contraseña" type="password" [(ngModel)]="password"></ion-input>
     </ion-item>
+
+    <ion-button expand="block" (click)="submit()" class="submit-btn">
+      {{ mode === 'register' ? 'Crear cuenta' : 'Entrar' }}
+    </ion-button>
+
+    <p class="error-msg" *ngIf="error">{{ error }}</p>
   </div>
-
-  <ion-item>
-    <ion-input label="Email" type="email" [(ngModel)]="email"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input label="Password" type="password" [(ngModel)]="password"></ion-input>
-  </ion-item>
-
-  <ion-button expand="block" (click)="submit()" class="ion-margin-top">
-    {{ mode === 'register' ? 'Crear cuenta' : 'Entrar' }}
-  </ion-button>
-
-  <ion-text color="danger" *ngIf="error">
-    <p class="ion-text-center">{{ error }}</p>
-  </ion-text>
 </ion-content>
