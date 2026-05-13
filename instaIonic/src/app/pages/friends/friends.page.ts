@@ -23,7 +23,7 @@ export class FriendsPage implements OnInit {
 
   friends: any[] = [];
   pending: any[] = [];
-  base = 'http://127.0.0.1:8000/storage/';
+  base = 'http://20.151.96.66/storage/';
 
   constructor(private api: Api) {}
 
