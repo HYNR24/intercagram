@@ -8,53 +8,33 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <ion-item>
+    <ion-input label="Descripción" [(ngModel)]="caption"></ion-input>
+  </ion-item>
 
-  <!-- Camera viewfinder -->
-  <div class="camera-view" *ngIf="showCamera">
-    <video #videoEl autoplay playsinline class="camera-video"></video>
-    <canvas #canvasEl hidden></canvas>
-    <div class="camera-controls">
-      <ion-button fill="clear" (click)="flipCamera()">
-        <ion-icon name="camera-reverse" size="large"></ion-icon>
-      </ion-button>
-      <ion-button fill="solid" color="primary" (click)="capture()" class="capture-btn">
-        <ion-icon name="camera" size="large"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" (click)="closeCamera()">
-        <ion-icon name="close-outline" size="large"></ion-icon>
-      </ion-button>
-    </div>
-  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-button expand="block" (click)="cameraInput.click()">
+          <ion-icon name="camera" size="large"></ion-icon>
+          Usar cámara
+        </ion-button>
+        <input #cameraInput type="file" accept="image/*" capture="environment" hidden (change)="onFileChange($event)" />
+      </ion-col>
+      <ion-col>
+        <ion-button expand="block" (click)="fileInput.click()">
+          <ion-icon name="file-tray" size="large"></ion-icon>
+          Elegir archivo
+        </ion-button>
+        <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)" />
+      </ion-col>
+      <ion-col><ion-button expand="block" (click)="upload()" [disabled]="uploading">
+        <ion-icon name="cloud-upload" size="large"></ion-icon>
+        {{ uploading ? 'Publicando...' : 'Publicar' }}
+      </ion-button></ion-col>
+    </ion-row>
+  </ion-grid>
 
-  <!-- Form (hidden while camera is active) -->
-  <ng-container *ngIf="!showCamera">
-    <ion-item>
-      <ion-input label="Descripción" [(ngModel)]="caption"></ion-input>
-    </ion-item>
-
-    <ion-grid>
-      <ion-row>
-        <ion-col>
-          <ion-button expand="block" (click)="openCamera()">
-            <ion-icon name="camera" size="large"></ion-icon>
-            Usar cámara
-          </ion-button>
-        </ion-col>
-        <ion-col>
-          <ion-button expand="block" (click)="fileInput.click()">
-            <ion-icon name="file-tray" size="large"></ion-icon>
-            Elegir archivo
-          </ion-button>
-          <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)" />
-        </ion-col>
-        <ion-col><ion-button expand="block" (click)="upload()" [disabled]="uploading">
-          <ion-icon name="cloud-upload" size="large"></ion-icon>
-          {{ uploading ? 'Publicando...' : 'Publicar' }}
-        </ion-button></ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <ion-img *ngIf="preview" [src]="preview" style="margin-top:16px;border-radius:12px;"></ion-img>
-  </ng-container>
+  <ion-img *ngIf="preview" [src]="preview" style="margin-top:16px;border-radius:12px;"></ion-img>
 
 </ion-content>
