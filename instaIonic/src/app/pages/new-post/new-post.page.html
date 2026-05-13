@@ -47,9 +47,9 @@
           </ion-button>
           <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)" />
         </ion-col>
-        <ion-col><ion-button expand="block" (click)="upload()">
+        <ion-col><ion-button expand="block" (click)="upload()" [disabled]="uploading">
           <ion-icon name="cloud-upload" size="large"></ion-icon>
-          Publicar
+          {{ uploading ? 'Publicando...' : 'Publicar' }}
         </ion-button></ion-col>
       </ion-row>
     </ion-grid>

@@ -28,6 +28,7 @@ export class NewPostPage implements OnInit, AfterViewInit {
   file?: File;
   preview?: string;
   showCamera = false;
+  uploading = false;
   facingMode: 'user' | 'environment' = 'environment';
   private stream: MediaStream | null = null;
 
@@ -104,9 +105,11 @@ export class NewPostPage implements OnInit, AfterViewInit {
   }
 
   upload() {
-    if (!this.file) return;
-    this.api.createPost(this.file, this.caption).subscribe(() => {
-      this.router.navigateByUrl('/feed');
+    if (!this.file || this.uploading) return;
+    this.uploading = true;
+    this.api.createPost(this.file, this.caption).subscribe({
+      next: () => this.router.navigateByUrl('/feed'),
+      error: () => this.uploading = false
     });
   }
 
