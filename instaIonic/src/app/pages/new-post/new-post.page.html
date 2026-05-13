@@ -15,10 +15,11 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <ion-button expand="block" (click)="takePhoto()">
+        <ion-button expand="block" (click)="cameraInput.click()">
           <ion-icon name="camera" size="large"></ion-icon>
           Usar cámara
         </ion-button>
+        <input #cameraInput type="file" accept="image/*" capture="environment" hidden (change)="onFileChange($event)" />
       </ion-col>
       <ion-col>
         <ion-button expand="block" (click)="fileInput.click()">

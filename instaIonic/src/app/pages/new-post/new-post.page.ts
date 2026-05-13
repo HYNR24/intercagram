@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, IonImg, IonButtons, IonBackButton, IonIcon, IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
 import { Api } from '../../services/api';
 import { Router } from '@angular/router';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 import { addIcons } from 'ionicons';
 import { camera, fileTray, cloudUpload } from 'ionicons/icons';
@@ -43,30 +42,6 @@ export class NewPostPage implements OnInit {
     this.api.createPost(this.file, this.caption).subscribe(() => {
       this.router.navigateByUrl('/feed');
     });
-  }
-
-  async takePhoto() {
-    const photo = await Camera.getPhoto({
-      quality: 80,
-      resultType: CameraResultType.DataUrl,
-      source: CameraSource.Camera
-    });
-
-    this.preview = photo.dataUrl || undefined;
-    // convertir a File
-    if (photo.dataUrl) {
-      this.file = this.dataUrlToFile(photo.dataUrl, 'photo.jpg');
-    }
-  }
-
-  private dataUrlToFile(dataUrl: string, filename: string): File {
-    const arr = dataUrl.split(',');
-    const mime = arr[0].match(/:(.*?);/)![1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) u8arr[n] = bstr.charCodeAt(n);
-    return new File([u8arr], filename, { type: mime });
   }
 
 }
