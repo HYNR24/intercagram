@@ -11,9 +11,42 @@ use App\Http\Controllers\FriendshipController;
 
 Route::get('/', function () {
     return response()->json([
-        'message' => 'Intercagram API funcionando',
+        'app' => 'Intercagram API',
         'version' => '1.0.0',
-        'status' => 'online'
+        'status' => 'online',
+        'documentacion' => 'Documentación API.pdf',
+        'endpoints' => [
+            'autenticacion' => [
+                'POST /api/register' => 'Registro de usuario',
+                'POST /api/login'    => 'Inicio de sesión',
+                'POST /api/logout'   => 'Cerrar sesión (token requerido)',
+                'GET /api/me'        => 'Perfil del usuario autenticado (token requerido)',
+            ],
+            'posts' => [
+                'GET /api/posts'             => 'Listar publicaciones (token requerido)',
+                'POST /api/posts'            => 'Crear publicación (token requerido)',
+                'GET /api/posts/{id}'        => 'Ver publicación (token requerido)',
+                'DELETE /api/posts/{id}'     => 'Eliminar publicación (token requerido)',
+                'POST /api/posts/{id}/like'  => 'Dar like (token requerido)',
+                'DELETE /api/posts/{id}/like'=> 'Quitar like (token requerido)',
+            ],
+            'comentarios' => [
+                'GET /api/posts/{id}/comments'  => 'Ver comentarios (token requerido)',
+                'POST /api/posts/{id}/comments' => 'Comentar (token requerido)',
+            ],
+            'amistades' => [
+                'GET /api/friends'              => 'Listar amigos (token requerido)',
+                'POST /api/users/{username}/friend' => 'Enviar solicitud (token requerido)',
+                'DELETE /api/users/{username}/friend'=> 'Eliminar amigo (token requerido)',
+                'POST /api/friendships/{id}/accept' => 'Aceptar solicitud (token requerido)',
+                'GET /api/friendships/pending'   => 'Solicitudes pendientes (token requerido)',
+                'GET /api/users/suggested'       => 'Usuarios sugeridos (token requerido)',
+            ],
+            'usuarios' => [
+                'GET /api/users/search?q='      => 'Buscar usuarios (token requerido)',
+                'GET /api/users/{username}/posts'=> 'Publicaciones de usuario (token requerido)',
+            ],
+        ],
     ]);
 });
 
