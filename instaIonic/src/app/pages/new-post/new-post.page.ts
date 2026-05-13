@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, IonImg, IonButtons, IonBackButton, IonIcon, IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, IonImg, IonButtons, IonBackButton, IonIcon, IonCol, IonGrid, IonRow, ToastController } from '@ionic/angular/standalone';
 import { Api } from '../../services/api';
 import { Router } from '@angular/router';
 
@@ -32,7 +32,11 @@ export class NewPostPage implements OnInit, AfterViewInit {
   facingMode: 'user' | 'environment' = 'environment';
   private stream: MediaStream | null = null;
 
-  constructor(private api: Api, private router: Router) {
+  constructor(
+    private api: Api,
+    private router: Router,
+    private toast: ToastController
+  ) {
     addIcons({camera, cameraReverse, fileTray, cloudUpload});
   }
   
@@ -104,11 +108,20 @@ export class NewPostPage implements OnInit, AfterViewInit {
     this.preview = URL.createObjectURL(f);
   }
 
-  upload() {
+  async upload() {
     if (!this.file || this.uploading) return;
     this.uploading = true;
     this.api.createPost(this.file, this.caption).subscribe({
-      next: () => this.router.navigateByUrl('/feed'),
+      next: async () => {
+        const t = await this.toast.create({
+          message: 'Publicación creada',
+          duration: 1500,
+          color: 'success',
+          position: 'bottom'
+        });
+        await t.present();
+        setTimeout(() => this.router.navigateByUrl('/feed'), 1500);
+      },
       error: () => this.uploading = false
     });
   }
