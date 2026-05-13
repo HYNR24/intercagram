@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Amigos</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/feed"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Solicitudes Pendientes -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Solicitudes ({{ pending.length }})</h3>
+    </div>
+    <div class="user-item" *ngFor="let r of pending">
+      <div class="user-info">
+        <ion-avatar class="user-avatar">
+          <img [src]="r.user?.profile?.avatar ? base + r.user.profile.avatar : 'assets/icon/favicon.png'" />
+        </ion-avatar>
+        <div class="user-details">
+          <strong>{{ r.user?.profile?.username || r.user?.name }}</strong>
+        </div>
+      </div>
+      <ion-button size="small" color="primary" (click)="accept(r)">
+        Aceptar
+      </ion-button>
+    </div>
+    <div class="empty-state" *ngIf="pending.length === 0">
+      <p>No tienes solicitudes pendientes</p>
+    </div>
+  </div>
+
+  <!-- Siguiendo -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Siguiendo ({{ friends.length }})</h3>
+    </div>
+    <div class="user-item" *ngFor="let f of friends">
+      <div class="user-info">
+        <ion-avatar class="user-avatar">
+          <img [src]="f.profile?.avatar ? base + f.profile.avatar : 'assets/icon/favicon.png'" />
+        </ion-avatar>
+        <div class="user-details">
+          <strong>{{ f.profile?.username || f.name }}</strong>
+          <span *ngIf="f.name && f.profile?.username">{{ f.name }}</span>
+        </div>
+      </div>
+      <ion-button size="small" color="medium" (click)="unfollow(f)">
+        Dejar de seguir
+      </ion-button>
+    </div>
+    <div class="empty-state" *ngIf="friends.length === 0">
+      <p>No sigues a nadie todavía</p>
+      <p>Busca usuarios en el feed para seguir sus publicaciones</p>
+    </div>
+  </div>
+</ion-content>

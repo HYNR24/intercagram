@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon [icon]="icons.back" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Mensajes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="empty-state">
+    <div class="empty-icon">
+      <ion-icon [icon]="icons.back"></ion-icon>
+    </div>
+    <h3>Mensajes</h3>
+    <p>Próximamente podrás chatear con tus amigos</p>
+  </div>
+</ion-content>

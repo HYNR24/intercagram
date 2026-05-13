@@ -1,0 +1,191 @@
+<ion-header *ngIf="!showViewer">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goNewPost()">
+        <ion-icon [icon]="icons.camera" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Intercagram
+      <div class="user-subtitle" *ngIf="currentUser?.profile">
+        @{{ currentUser.profile.username }}
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleSearch()">
+        <ion-icon [icon]="icons.search" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goMessages()">
+        <ion-icon [icon]="icons.messages" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goFriends()">
+        <ion-icon [icon]="icons.person" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="stories-bar">
+    <div class="story-item" *ngFor="let u of storyUsers" (click)="viewUserPosts(u.profile?.username)">
+      <div class="story-avatar">
+        <img [src]="u.profile?.avatar ? imgUrl(u.profile.avatar) : 'assets/icon/favicon.png'" />
+      </div>
+      <span class="story-username">{{ u.profile?.username || 'usuario' }}</span>
+    </div>
+  </div>
+
+  <!-- Search Section (toggle with header icon) -->
+  <div class="search-section" *ngIf="showSearchbar">
+    <ion-searchbar
+      [(ngModel)]="friendUsername"
+      placeholder="Buscar usuario..."
+      (ionInput)="onSearchInput($event)"
+      (ionFocus)="showSearch = true"
+      (ionClear)="searchResults = []; showSearch = false; showSearchbar = false"
+      [showCancelButton]="'focus'"
+    ></ion-searchbar>
+
+    <div class="search-results" *ngIf="showSearch && searchResults.length > 0">
+      <ion-item
+        *ngFor="let u of searchResults"
+        button
+        (click)="selectUser(u)"
+        class="search-item"
+      >
+        <ion-avatar slot="start">
+          <img [src]="u.profile?.avatar ? imgUrl(u.profile.avatar) : 'assets/icon/favicon.png'" />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ u.profile?.username }}</h2>
+          <p>{{ u.name }}</p>
+        </ion-label>
+        <ion-button size="small" slot="end" (click)="followUser(u.profile?.username); $event.stopPropagation()">
+          Seguir
+        </ion-button>
+      </ion-item>
+    </div>
+  </div>
+
+  <!-- Feed -->
+  <div class="feed-container">
+    <div class="post-card" *ngFor="let p of posts">
+      <div class="post-header">
+        <div class="post-user">
+          <ion-avatar class="post-avatar">
+            <img [src]="p.user?.profile?.avatar ? imgUrl(p.user.profile.avatar) : 'assets/icon/favicon.png'" />
+          </ion-avatar>
+          <span class="post-username">{{ p.user?.profile?.username || 'usuario' }}</span>
+        </div>
+      </div>
+
+      <div class="post-image" (click)="openUserPosts(p)">
+        <img [src]="imgUrl(p.image)" />
+      </div>
+
+      <div class="post-actions">
+        <ion-button fill="clear" size="small" (click)="like(p)" class="action-btn">
+          <ion-icon [icon]="p.likes?.length ? icons.heartFilled : icons.heartOutline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" size="small" (click)="openComments(p)" class="action-btn">
+          <ion-icon [icon]="icons.chat" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="post-likes" *ngIf="p.likes?.length">
+        <strong>{{ p.likes.length }} {{ p.likes.length === 1 ? 'like' : 'likes' }}</strong>
+      </div>
+
+      <div class="post-caption" *ngIf="p.caption">
+        <strong>{{ p.user?.profile?.username }}</strong> {{ p.caption }}
+      </div>
+
+      <div class="post-comments-link" *ngIf="p.comments?.length" (click)="openComments(p)">
+        Ver los {{ p.comments.length }} comentarios
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Comments Modal -->
+  <div class="comments-overlay" *ngIf="showComments" (click)="closeComments()">
+    <div class="comments-modal" (click)="$event.stopPropagation()">
+      <div class="comments-header">
+        <span>Comentarios</span>
+        <ion-button fill="clear" (click)="closeComments()">
+          <ion-icon [icon]="icons.close" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="comments-list">
+        <div class="comment-item" *ngFor="let c of comments">
+          <strong>{{ c.user?.profile?.username }}</strong> {{ c.content }}
+        </div>
+        <div class="no-comments" *ngIf="comments.length === 0">
+          No hay comentarios aún
+        </div>
+      </div>
+
+      <div class="comment-input">
+        <ion-input
+          [(ngModel)]="newComment"
+          placeholder="Escribe un comentario..."
+          (keyup.enter)="sendComment()"
+        ></ion-input>
+        <ion-button fill="clear" size="small" (click)="sendComment()">
+          <ion-icon [icon]="icons.paper" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Viewer overlay -->
+  <div class="viewer-overlay" *ngIf="showViewer && currentViewerPost" (click)="closeViewer()">
+    <div class="viewer-content" (click)="$event.stopPropagation()">
+
+      <div class="viewer-progress-bar">
+        <div
+          class="viewer-progress-segment"
+          *ngFor="let _ of viewerPosts; let i = index"
+        >
+          <div
+            class="viewer-progress-fill"
+            [class.active]="i === viewerIndex"
+            [style.width.%]="i === viewerIndex ? (viewerProgress / 15) * 100 : i < viewerIndex ? 100 : 0"
+          ></div>
+        </div>
+      </div>
+
+      <div class="viewer-user">
+        <ion-avatar class="viewer-avatar">
+          <img [src]="currentViewerPost.user?.profile?.avatar ? imgUrl(currentViewerPost.user.profile.avatar) : 'assets/icon/favicon.png'" />
+        </ion-avatar>
+        <span class="viewer-username">{{ currentViewerPost.user?.profile?.username }}</span>
+      </div>
+
+      <div class="viewer-body">
+        <div class="viewer-nav-left" *ngIf="hasPrev" (click)="prevPost()">
+          <ion-icon [icon]="icons.chevronBack" class="nav-arrow"></ion-icon>
+        </div>
+
+        <div class="viewer-image-wrapper">
+          <img [src]="imgUrl(currentViewerPost.image)" class="viewer-image" />
+          <div class="viewer-caption" *ngIf="currentViewerPost.caption">
+            {{ currentViewerPost.caption }}
+          </div>
+        </div>
+
+        <div class="viewer-nav-right" *ngIf="hasNext" (click)="nextPost()">
+          <ion-icon [icon]="icons.chevronForward" class="nav-arrow"></ion-icon>
+        </div>
+      </div>
+
+      <div class="viewer-close-btn">
+        <ion-button fill="clear" (click)="closeViewer()">
+          <ion-icon [icon]="icons.close" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+</ion-content>
