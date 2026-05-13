@@ -13,10 +13,8 @@ import { camera, cameraReverse, closeOutline, fileTray, cloudUpload } from 'ioni
   templateUrl: './new-post.page.html',
   styleUrls: ['./new-post.page.scss'],
   standalone: true,
-  imports: [IonRow, 
-    IonGrid, IonCol, IonIcon, IonBackButton, IonImg, IonHeader, 
-    IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, FormsModule, IonButtons, CommonModule,
-    IonGrid, IonCol
+  imports: [IonIcon, IonBackButton, IonImg, IonHeader, 
+    IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, FormsModule, IonButtons, CommonModule
   ]
 })
 export class NewPostPage {

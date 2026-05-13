@@ -53,8 +53,6 @@
     <div class="search-results" *ngIf="showSearch && searchResults.length > 0">
       <ion-item
         *ngFor="let u of searchResults"
-        button
-        (click)="selectUser(u)"
         class="search-item"
       >
         <ion-avatar slot="start">

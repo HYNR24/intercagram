@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
-  IonItem, IonInput, IonButton, IonText,
+  IonItem, IonInput, IonButton,
   IonSegment, IonSegmentButton, IonLabel
 } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';

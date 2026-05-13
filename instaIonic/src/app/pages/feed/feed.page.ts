@@ -115,7 +115,7 @@ export class FeedPage implements OnInit {
 
   sendComment() {
     if (!this.selectedPost || !this.newComment.trim()) return;
-    this.api.commentPost(this.selectedPost.id, this.newComment).subscribe(res => {
+    this.api.commentPost(this.selectedPost.id, this.newComment).subscribe((res: any) => {
       res.likes_count = 0;
       res.liked_by_me = false;
       this.comments.unshift(res);
