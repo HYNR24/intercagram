@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Auth } from './auth';
 
 
@@ -14,8 +14,8 @@ export class Api {
 
   private authHeaders() {
     const token = this.auth.getToken();
-    let headers = new HttpHeaders();
-    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
+    const headers: any = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     return { headers };
   }
 
