@@ -28,6 +28,19 @@ ion-title {
   letter-spacing: 0;
 }
 
+.user-subtitle.clickable {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.user-subtitle.clickable:hover {
+  opacity: 0.7;
+}
+
+.user-subtitle.clickable:active {
+  opacity: 0.5;
+}
+
 ion-button {
   --padding-start: 6px;
   --padding-end: 6px;

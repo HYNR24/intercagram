@@ -7,7 +7,7 @@
     </ion-buttons>
     <ion-title>
       Intercagram
-      <div class="user-subtitle" *ngIf="currentUser?.profile">
+      <div class="user-subtitle clickable" *ngIf="currentUser?.profile" (click)="goToProfile()">
         @{{ currentUser.profile.username }}
       </div>
     </ion-title>

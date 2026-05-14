@@ -105,6 +105,7 @@ export class FeedPage implements OnInit {
   goNewPost() { this.router.navigateByUrl('/new-post'); }
   goFriends() { this.router.navigateByUrl('/friends'); }
   goMessages() { this.router.navigateByUrl('/messages'); }
+  goToProfile() { this.router.navigateByUrl('/profile'); }
   toggleSearch() { this.showSearchbar = !this.showSearchbar; }
 
   imgUrl(path: string) { return this.base + path; }

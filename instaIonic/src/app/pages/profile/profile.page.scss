@@ -1,0 +1,142 @@
+ion-content {
+  --background: var(--inter-bg-primary);
+}
+
+.profile-container {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+}
+
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 16px;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  --border-radius: 50%;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--inter-border);
+}
+
+.avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.avatar-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--inter-gradient);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(108, 60, 225, 0.35);
+}
+
+.avatar-upload-label ion-icon {
+  font-size: 18px;
+  color: #fff;
+}
+
+.avatar-input {
+  display: none;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--inter-text-primary);
+  margin: 0 0 4px;
+  text-align: center;
+}
+
+.profile-username {
+  font-size: 14px;
+  color: var(--inter-text-muted);
+  margin: 0;
+  text-align: center;
+}
+
+.form-section {
+  width: 100%;
+}
+
+ion-item {
+  --background: var(--inter-bg-card);
+  --border-color: var(--inter-border);
+  --border-radius: var(--inter-radius-sm);
+  --padding-start: 14px;
+  margin-bottom: 14px;
+  border: 1px solid var(--inter-border);
+  border-radius: var(--inter-radius-sm);
+}
+
+ion-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--inter-text-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+ion-input, ion-textarea {
+  --color: var(--inter-text-primary);
+  --placeholder-color: var(--inter-text-muted);
+  font-size: 14px;
+}
+
+.save-btn {
+  width: 100%;
+  margin-top: 8px;
+  --border-radius: var(--inter-radius-sm);
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: none;
+  --background: var(--inter-gradient);
+  --box-shadow: 0 4px 16px rgba(108, 60, 225, 0.35);
+  letter-spacing: 0;
+}
+
+.profile-message {
+  text-align: center;
+  font-size: 13px;
+  color: var(--inter-success);
+  margin-top: 12px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+
+ion-button {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+}

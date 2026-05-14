@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Perfil</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="profile-container" *ngIf="!loading && user">
+    <div class="avatar-section">
+      <div class="avatar-wrapper">
+        <ion-avatar class="profile-avatar">
+          <img [src]="user.profile?.avatar ? imgUrl(user.profile.avatar) : 'assets/icon/favicon.png'" />
+        </ion-avatar>
+        <div class="avatar-overlay">
+          <label class="avatar-upload-label">
+            <ion-icon name="camera-outline"></ion-icon>
+            <input type="file" accept="image/*" (change)="onAvatarSelected($event)" class="avatar-input" />
+          </label>
+        </div>
+      </div>
+      <h2 class="profile-name">{{ user.name }}</h2>
+      <p class="profile-username">@{{ user.profile?.username }}</p>
+    </div>
+
+    <div class="form-section">
+      <ion-item>
+        <ion-label position="stacked">Email</ion-label>
+        <ion-input [value]="user.email" readonly disabled></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Biografía</ion-label>
+        <ion-textarea [(ngModel)]="bio" placeholder="Cuéntanos sobre ti..." [autoGrow]="true" maxlength="500"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Sitio web</ion-label>
+        <ion-input [(ngModel)]="website" placeholder="https://..."></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" class="save-btn" (click)="saveProfile()" [disabled]="saving">
+        <ion-spinner *ngIf="saving" slot="start"></ion-spinner>
+        {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+      </ion-button>
+
+      <p class="profile-message" *ngIf="message">{{ message }}</p>
+    </div>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+  </div>
+</ion-content>

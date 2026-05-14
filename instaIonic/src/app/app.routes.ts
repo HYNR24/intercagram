@@ -30,4 +30,8 @@ export const routes: Routes = [
     path: 'messages',
     loadComponent: () => import('./pages/messages/messages.page').then( m => m.MessagesPage)
   },
+  {
+    path: 'profile',
+    loadComponent: () => import('./pages/profile/profile.page').then( m => m.ProfilePage)
+  },
 ];

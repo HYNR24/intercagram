@@ -101,4 +101,14 @@ export class Api {
     return this.http.get(this.apiUrl + `users/${username}/friend/status`, this.authHeaders());
   }
 
+  updateProfile(data: { bio?: string; website?: string }) {
+    return this.http.put<any>(this.apiUrl + 'profile', data, this.authHeaders());
+  }
+
+  updateAvatar(file: File) {
+    const fd = new FormData();
+    fd.append('avatar', file);
+    return this.http.post<any>(this.apiUrl + 'profile/avatar', fd, this.authHeaders());
+  }
+
 }
