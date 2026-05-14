@@ -51,7 +51,7 @@ class FriendshipController extends Controller
 
     public function myFriends(Request $request)
     {
-        return $request->user()->friends;
+        return $request->user()->friends()->with('profile')->get();
     }
 
     public function pending(Request $request)
