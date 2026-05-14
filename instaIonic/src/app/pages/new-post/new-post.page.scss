@@ -84,4 +84,18 @@ ion-content {
   overflow: hidden;
   box-shadow: var(--inter-shadow);
   border: 1px solid var(--inter-border-light);
+  animation: fadeIn 0.25s ease;
+}
+
+.preview-image {
+  width: 100%;
+  display: block;
+  max-height: 50vh;
+  object-fit: contain;
+  background: var(--inter-bg-primary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

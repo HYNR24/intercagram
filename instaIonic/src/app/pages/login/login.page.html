@@ -31,12 +31,15 @@
       <ion-item>
         <ion-input label="Email" type="email" [(ngModel)]="email"></ion-input>
       </ion-item>
-      <ion-item>
-        <ion-input label="Contraseña" type="password" [(ngModel)]="password"></ion-input>
+      <ion-item class="password-item">
+        <ion-input label="Contraseña" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password"></ion-input>
+        <ion-button slot="end" fill="clear" (click)="showPassword = !showPassword" class="eye-btn">
+          <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" slot="icon-only"></ion-icon>
+        </ion-button>
       </ion-item>
 
-      <ion-button expand="block" (click)="submit()" class="submit-btn">
-        {{ mode === 'register' ? 'Crear cuenta' : 'Entrar' }}
+      <ion-button expand="block" (click)="submit()" class="submit-btn" [disabled]="loading">
+        {{ loading ? '...' : (mode === 'register' ? 'Crear cuenta' : 'Entrar') }}
       </ion-button>
 
       <p class="error-msg" *ngIf="error">{{ error }}</p>

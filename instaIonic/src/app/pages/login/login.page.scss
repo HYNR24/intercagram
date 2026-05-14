@@ -90,3 +90,19 @@ ion-input {
   text-align: center;
   color: var(--inter-danger);
 }
+
+.password-item {
+  --inner-padding-end: 0;
+}
+
+.password-item ion-button.eye-btn {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --color: var(--inter-text-muted);
+  margin: 0;
+  min-height: 44px;
+}
+
+.password-item ion-button.eye-btn ion-icon {
+  font-size: 20px;
+}

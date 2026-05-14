@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, IonImg, IonButtons, IonBackButton, IonIcon, IonCol, IonGrid, IonRow, ToastController } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, IonButtons, IonBackButton, IonIcon, ToastController } from '@ionic/angular/standalone';
 import { Api } from '../../services/api';
 import { Router } from '@angular/router';
 
@@ -13,7 +13,7 @@ import { camera, cameraReverse, closeOutline, fileTray, cloudUpload } from 'ioni
   templateUrl: './new-post.page.html',
   styleUrls: ['./new-post.page.scss'],
   standalone: true,
-  imports: [IonIcon, IonBackButton, IonImg, IonHeader, 
+  imports: [IonIcon, IonBackButton, IonHeader, 
     IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, FormsModule, IonButtons, CommonModule
   ]
 })
@@ -102,8 +102,9 @@ export class NewPostPage {
   }
 
   onFileChange(ev: any) {
-    const f = ev.target.files[0];
-    if (f) this.file = f;
+    const f = ev.target.files?.[0];
+    if (!f) return;
+    this.file = f;
     this.preview = URL.createObjectURL(f);
   }
 
@@ -124,11 +125,12 @@ export class NewPostPage {
         this.preview = undefined;
         setTimeout(() => this.router.navigateByUrl('/feed', { replaceUrl: true }), 1000);
       },
-      error: async () => {
+      error: async (err: any) => {
         this.uploading = false;
+        const msg = err?.error?.message || err?.message || 'Error al publicar. Intenta de nuevo.';
         const t = await this.toast.create({
-          message: 'Error al publicar. Intenta de nuevo.',
-          duration: 2000,
+          message: msg,
+          duration: 3000,
           color: 'danger',
           position: 'bottom'
         });

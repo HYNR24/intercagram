@@ -226,7 +226,7 @@
     </div>
   </div>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="newpost-fab">
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="newpost-fab" *ngIf="!showViewer">
     <ion-fab-button (click)="goNewPost()">
       <ion-icon [icon]="icons.add" class="fab-icon"></ion-icon>
     </ion-fab-button>

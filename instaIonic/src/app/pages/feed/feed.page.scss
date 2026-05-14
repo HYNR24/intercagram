@@ -575,8 +575,14 @@ ion-button ion-icon {
 /* ========== PC / TABLET ========== */
 /* ========== FLOATING ACTION BUTTON ========== */
 .newpost-fab {
-  margin-bottom: 8px;
-  margin-right: 8px;
+  margin-bottom: 20px;
+  margin-right: 12px;
+  animation: fabIn 0.3s ease;
+}
+
+@keyframes fabIn {
+  from { opacity: 0; transform: scale(0.5) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .newpost-fab ion-fab-button {
@@ -590,6 +596,14 @@ ion-button ion-icon {
 .fab-icon {
   font-size: 28px;
   color: #fff;
+}
+
+ion-fab-button::part(native) {
+  transition: transform 0.15s ease;
+}
+
+ion-fab-button:active::part(native) {
+  transform: scale(0.9);
 }
 
 @media (min-width: 768px) {
