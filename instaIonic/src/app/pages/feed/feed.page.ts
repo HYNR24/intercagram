@@ -11,7 +11,8 @@ import {
   chatbubbleOutline, paperPlaneOutline,
   personAdd, closeOutline, searchOutline,
   chevronBackOutline, chevronForwardOutline,
-  checkmarkCircle, personRemove
+  checkmarkCircle, personRemove,
+  logOutOutline
 } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Api } from '../../services/api';
@@ -69,7 +70,8 @@ export class FeedPage implements OnInit {
     chevronBack: chevronBackOutline,
     chevronForward: chevronForwardOutline,
     checkmark: checkmarkCircle,
-    personRemove
+    personRemove,
+    logout: logOutOutline
   };
 
   constructor(
