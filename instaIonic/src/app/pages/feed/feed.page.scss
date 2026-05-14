@@ -494,3 +494,101 @@ ion-content {
 .viewer-close-btn ion-icon {
   font-size: 28px;
 }
+
+/* ========== PC / TABLET (sin afectar móvil) ========== */
+@media (min-width: 768px) {
+  ion-toolbar {
+    --min-height: 50px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+
+  ion-title {
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .stories-bar {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 12px 16px;
+    gap: 18px;
+  }
+
+  .story-item {
+    width: 72px;
+  }
+
+  .story-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .story-username {
+    font-size: 11px;
+    max-width: 72px;
+  }
+
+  .feed-container {
+    padding-bottom: 24px;
+  }
+
+  .post-card {
+    margin: 12px 0;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .post-header {
+    padding: 12px 16px;
+  }
+
+  .post-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .post-username {
+    font-size: 14px;
+  }
+
+  .post-actions {
+    padding: 4px 8px;
+  }
+
+  .action-btn ion-icon {
+    font-size: 24px;
+  }
+
+  .post-likes {
+    padding: 0 16px 4px;
+    font-size: 14px;
+  }
+
+  .post-caption {
+    padding: 0 16px 4px;
+    font-size: 14px;
+  }
+
+  .post-comments-link {
+    padding: 0 16px 8px;
+    font-size: 14px;
+  }
+
+  .search-section {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .comments-modal {
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 14px;
+    max-height: 50vh;
+  }
+
+  .comments-overlay {
+    align-items: center;
+    justify-content: center;
+  }
+}
