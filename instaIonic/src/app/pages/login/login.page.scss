@@ -12,14 +12,10 @@ ion-content {
 }
 
 .login-logo {
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -1px;
-  background: var(--inter-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 4px;
+  width: 180px;
+  max-width: 80%;
+  height: auto;
+  margin-bottom: 8px;
 }
 
 .login-tagline {
