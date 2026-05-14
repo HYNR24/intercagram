@@ -1,12 +1,10 @@
 <ion-header *ngIf="!showViewer">
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button (click)="goNewPost()">
-        <ion-icon [icon]="icons.camera" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
     <ion-title>
-      Intercagram
+      <div class="title-content">
+        <img src="assets/icon/logo.png" alt="Intercagram" class="title-logo" />
+        <span class="title-text">INTERCAGRAM</span>
+      </div>
       <div class="user-subtitle clickable" *ngIf="currentUser?.profile" (click)="goToProfile()">
         @{{ currentUser.profile.username }}
       </div>
@@ -227,5 +225,11 @@
       </div>
     </div>
   </div>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="newpost-fab">
+    <ion-fab-button (click)="goNewPost()">
+      <ion-icon [icon]="icons.add" class="fab-icon"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
 </ion-content>

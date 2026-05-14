@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonItem, IonAvatar, IonLabel, IonButton, IonButtons,
-  IonInput, IonIcon, IonSearchbar, IonSpinner
+  IonInput, IonIcon, IonSearchbar, IonSpinner,
+  IonFab, IonFabButton
 } from '@ionic/angular/standalone';
 import {
   cameraOutline, heartOutline, heart,
@@ -12,7 +13,7 @@ import {
   personAdd, closeOutline, searchOutline,
   chevronBackOutline, chevronForwardOutline,
   checkmarkCircle, personRemove,
-  logOutOutline
+  logOutOutline, addOutline
 } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Api } from '../../services/api';
@@ -26,7 +27,8 @@ import { Auth } from '../../services/auth';
   imports: [
     IonSpinner, IonSearchbar, IonInput, IonHeader, IonToolbar, IonTitle, IonContent,
     IonItem, IonAvatar, IonLabel, IonButton, IonButtons,
-    FormsModule, CommonModule, IonIcon
+    FormsModule, CommonModule, IonIcon,
+    IonFab, IonFabButton
   ]
 })
 export class FeedPage implements OnInit {
@@ -71,7 +73,8 @@ export class FeedPage implements OnInit {
     chevronForward: chevronForwardOutline,
     checkmark: checkmarkCircle,
     personRemove,
-    logout: logOutOutline
+    logout: logOutOutline,
+    add: addOutline
   };
 
   constructor(
