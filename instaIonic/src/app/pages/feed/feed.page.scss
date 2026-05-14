@@ -497,6 +497,23 @@ ion-content {
 
 /* ========== PC / TABLET (sin afectar móvil) ========== */
 @media (min-width: 768px) {
+  .post-image {
+    max-height: 60vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+  }
+
+  .post-image img {
+    width: 100%;
+    height: auto;
+    max-height: 60vh;
+    object-fit: contain;
+    display: block;
+  }
+
   ion-toolbar {
     --min-height: 50px;
     --padding-start: 16px;
