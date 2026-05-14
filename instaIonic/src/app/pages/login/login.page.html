@@ -6,6 +6,9 @@
 
 <ion-content class="ion-padding">
   <div class="login-container">
+    <div class="login-logo">Intercagram</div>
+    <p class="login-tagline">Conecta con el mundo</p>
+
     <ion-segment [(ngModel)]="mode">
       <ion-segment-button value="login">
         <ion-label>Ingresar</ion-label>
@@ -15,26 +18,28 @@
       </ion-segment-button>
     </ion-segment>
 
-    <div *ngIf="mode === 'register'">
+    <div class="form-fields">
+      <div *ngIf="mode === 'register'" class="extra-fields">
+        <ion-item>
+          <ion-input label="Nombre" [(ngModel)]="name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Usuario" [(ngModel)]="username"></ion-input>
+        </ion-item>
+      </div>
+
       <ion-item>
-        <ion-input label="Nombre" [(ngModel)]="name"></ion-input>
+        <ion-input label="Email" type="email" [(ngModel)]="email"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-input label="Usuario" [(ngModel)]="username"></ion-input>
+        <ion-input label="Contraseña" type="password" [(ngModel)]="password"></ion-input>
       </ion-item>
+
+      <ion-button expand="block" (click)="submit()" class="submit-btn">
+        {{ mode === 'register' ? 'Crear cuenta' : 'Entrar' }}
+      </ion-button>
+
+      <p class="error-msg" *ngIf="error">{{ error }}</p>
     </div>
-
-    <ion-item>
-      <ion-input label="Email" type="email" [(ngModel)]="email"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-input label="Contraseña" type="password" [(ngModel)]="password"></ion-input>
-    </ion-item>
-
-    <ion-button expand="block" (click)="submit()" class="submit-btn">
-      {{ mode === 'register' ? 'Crear cuenta' : 'Entrar' }}
-    </ion-button>
-
-    <p class="error-msg" *ngIf="error">{{ error }}</p>
   </div>
 </ion-content>

@@ -1,28 +1,27 @@
-ion-header ion-toolbar {
-  --border-width: 0;
+ion-content {
+  --background: var(--inter-bg-primary);
 }
 
-ion-content {
-  --background: #fafafa;
+ion-header ion-toolbar {
+  --border-width: 0;
+  border-bottom: 1px solid var(--inter-border-light);
 }
 
 .section {
-  background: #fff;
-  margin: 0 0 8px;
   padding: 4px 0;
 }
 
 .section-header {
-  padding: 12px 16px 4px;
+  padding: 16px 16px 8px;
 }
 
 .section-header h3 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #8e8e8e;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--inter-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .user-item {
@@ -30,7 +29,12 @@ ion-content {
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--inter-border-light);
+  transition: background 0.15s;
+}
+
+.user-item:active {
+  background: var(--inter-bg-card);
 }
 
 .user-item:last-child {
@@ -42,12 +46,14 @@ ion-content {
   align-items: center;
   gap: 12px;
   flex: 1;
+  min-width: 0;
 }
 
 .user-avatar {
   width: 44px;
   height: 44px;
   --border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .user-avatar img {
@@ -55,21 +61,22 @@ ion-content {
   object-fit: cover;
   width: 100%;
   height: 100%;
-  border: 1px solid #efefef;
+  border: 2px solid var(--inter-border);
 }
 
 .user-details strong {
   display: block;
   font-size: 14px;
-  color: #262626;
+  color: var(--inter-text-primary);
+  font-weight: 700;
 }
 
 .user-details span {
   font-size: 12px;
-  color: #8e8e8e;
+  color: var(--inter-text-muted);
 }
 
-ion-button {
+ion-button[size="small"] {
   --border-radius: 6px;
   text-transform: none;
   font-weight: 600;
@@ -77,12 +84,24 @@ ion-button {
   --padding-start: 12px;
   --padding-end: 12px;
   min-height: 30px;
+  letter-spacing: 0;
+}
+
+ion-button[color="primary"] {
+  --background: var(--inter-gradient);
+  --box-shadow: 0 2px 8px rgba(108, 60, 225, 0.25);
+}
+
+ion-button[color="medium"] {
+  --background: var(--inter-bg-card);
+  --color: var(--inter-text-secondary);
+  border: 1px solid var(--inter-border);
 }
 
 .empty-state {
   text-align: center;
-  padding: 40px 16px;
-  color: #8e8e8e;
+  padding: 48px 16px;
+  color: var(--inter-text-muted);
 }
 
 .empty-state p {

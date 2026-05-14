@@ -1,37 +1,125 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
-
-/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
-
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+:root {
+  --inter-bg-primary: #0a0a0a;
+  --inter-bg-secondary: #121212;
+  --inter-bg-card: #1a1a2e;
+  --inter-bg-elevated: #1e1e32;
+  --inter-gradient: linear-gradient(135deg, #6C3CE1, #E94057, #F27121);
+  --inter-gradient-subtle: linear-gradient(135deg, rgba(108, 60, 225, 0.15), rgba(233, 64, 87, 0.1));
+  --inter-text-primary: #ffffff;
+  --inter-text-secondary: #9e9eb0;
+  --inter-text-muted: #6e6e80;
+  --inter-border: #2a2a3e;
+  --inter-border-light: #1e1e30;
+  --inter-accent: #6C3CE1;
+  --inter-accent-pink: #E94057;
+  --inter-accent-orange: #F27121;
+  --inter-success: #2dd55b;
+  --inter-danger: #ff3b5c;
+  --inter-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --inter-radius-sm: 8px;
+  --inter-radius-md: 12px;
+  --inter-radius-lg: 16px;
+  --inter-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ion-font-family: var(--inter-font);
+}
+
+ion-content {
+  --background: var(--inter-bg-primary);
+}
+
+ion-toolbar {
+  --background: var(--inter-bg-secondary);
+  --border-width: 0;
+  --color: var(--inter-text-primary);
+}
+
+ion-header ion-toolbar {
+  --border-width: 0;
+  --min-height: 48px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+ion-button {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+  --border-radius: var(--inter-radius-sm);
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --min-height: 38px;
+  font-size: 13px;
+}
+
+ion-button.button-solid {
+  --box-shadow: none;
+}
+
+ion-button::part(native) {
+  font-weight: 600;
+}
+
+ion-item {
+  --background: var(--inter-bg-card);
+  --border-color: var(--inter-border);
+  --color: var(--inter-text-primary);
+  --border-radius: var(--inter-radius-sm);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --min-height: 48px;
+  --highlight-height: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 10px;
+  border-radius: var(--inter-radius-sm);
+}
+
+ion-item.item-lines-none {
+  --border-width: 0;
+}
+
+ion-input, ion-textarea {
+  --color: var(--inter-text-primary);
+  --placeholder-color: var(--inter-text-muted);
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  font-size: 14px;
+}
+
+ion-searchbar {
+  --background: var(--inter-bg-card);
+  --color: var(--inter-text-primary);
+  --placeholder-color: var(--inter-text-muted);
+  --icon-color: var(--inter-text-muted);
+  --border-radius: var(--inter-radius-sm);
+  --box-shadow: none;
+  padding: 0;
+}
+
+ion-avatar {
+  --border-radius: 50%;
+}
+
+ion-spinner {
+  --color: var(--inter-accent);
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}

@@ -1,56 +1,96 @@
-ion-header ion-toolbar {
-  --border-width: 0;
-}
-
 ion-content {
-  --background: #fafafa;
-}
-
-ion-segment {
-  margin-bottom: 24px;
-  --background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --background: var(--inter-bg-primary);
 }
 
 .login-container {
-  max-width: 400px;
+  max-width: 380px;
   margin: 0 auto;
-  padding-top: 16px;
+  padding: 40px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-logo {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: var(--inter-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+}
+
+.login-tagline {
+  font-size: 13px;
+  color: var(--inter-text-muted);
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+ion-segment {
+  width: 100%;
+  margin-bottom: 24px;
+  --background: var(--inter-bg-card);
+  border-radius: var(--inter-radius-sm);
+  --border-radius: var(--inter-radius-sm);
+}
+
+ion-segment-button {
+  --background-checked: transparent;
+  --color: var(--inter-text-muted);
+  --color-checked: var(--inter-text-primary);
+  --indicator-color: var(--inter-gradient);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.form-fields {
+  width: 100%;
 }
 
 ion-item {
-  --background: #fff;
-  --border-radius: 8px;
-  --padding-start: 12px;
-  --padding-end: 12px;
+  --background: var(--inter-bg-card);
+  --border-color: var(--inter-border);
+  --border-radius: var(--inter-radius-sm);
+  --padding-start: 14px;
   margin-bottom: 12px;
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-  --border-color: #dbdbdb;
-  --highlight-height: 0;
+  border: 1px solid var(--inter-border);
+  border-radius: var(--inter-radius-sm);
 }
 
 ion-input {
-  --padding-top: 12px;
-  --padding-bottom: 12px;
+  --color: var(--inter-text-primary);
+  --placeholder-color: var(--inter-text-muted);
+  --padding-top: 14px;
+  --padding-bottom: 14px;
   font-size: 14px;
 }
 
 .submit-btn {
-  margin-top: 16px;
-  --border-radius: 8px;
+  width: 100%;
+  margin-top: 8px;
+  --border-radius: var(--inter-radius-sm);
   --padding-top: 16px;
   --padding-bottom: 16px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 15px;
   text-transform: none;
-  --box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+  --background: var(--inter-gradient);
+  --box-shadow: 0 4px 16px rgba(108, 60, 225, 0.35);
+  letter-spacing: 0;
+}
+
+.submit-btn.ion-activated {
+  --box-shadow: 0 2px 8px rgba(108, 60, 225, 0.25);
 }
 
 .error-msg {
-  margin-top: 12px;
+  margin-top: 16px;
   font-size: 13px;
   text-align: center;
-  color: #ed4956;
+  color: var(--inter-danger);
 }
