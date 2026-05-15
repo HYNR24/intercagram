@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -24,7 +24,7 @@ import { arrowBackOutline, sendOutline, personOutline } from 'ionicons/icons';
 })
 export class ChatPage implements OnInit, OnDestroy {
 
-  @ViewChild('scrollAnchor') scrollAnchor!: ElementRef;
+  @ViewChild(IonContent) content!: IonContent;
 
   username = '';
   otherUser: any = null;
@@ -70,7 +70,7 @@ export class ChatPage implements OnInit, OnDestroy {
           msg.receiver?.username === this.username;
         if (isRelevant) {
           this.messages.push(msg);
-          setTimeout(() => this.scrollToBottom(), 100);
+          this.scrollToBottom();
         }
       });
     }
@@ -113,7 +113,7 @@ export class ChatPage implements OnInit, OnDestroy {
             ? res[0].sender
             : res[0].receiver;
         }
-        setTimeout(() => this.scrollToBottom(), 200);
+        this.scrollToBottom();
       },
       error: () => this.loading = false
     });
@@ -134,7 +134,7 @@ export class ChatPage implements OnInit, OnDestroy {
         this.messages.push(msg);
         this.newMessage = '';
         this.sending = false;
-        setTimeout(() => this.scrollToBottom(), 100);
+        this.scrollToBottom();
       },
       error: () => this.sending = false
     });
@@ -147,9 +147,7 @@ export class ChatPage implements OnInit, OnDestroy {
   goBack() { this.router.navigateByUrl('/messages'); }
 
   private scrollToBottom() {
-    try {
-      this.scrollAnchor?.nativeElement?.scrollIntoView({ behavior: 'smooth' });
-    } catch {}
+    setTimeout(() => this.content?.scrollToBottom(0));
   }
 
   isMine(msg: any): boolean {

@@ -74,19 +74,18 @@ ion-button ion-icon {
 
 .notif-badge {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 16px;
-  height: 16px;
-  border-radius: 8px;
+  top: 0;
+  right: 0;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 7px;
   background: #ff3b5c;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
+  line-height: 14px;
+  text-align: center;
+  padding: 0 3px;
   z-index: 1;
   pointer-events: none;
 }
@@ -721,7 +720,7 @@ ion-fab-button:active::part(native) {
 }
 
 .notif-panel {
-  position: absolute;
+  position: fixed;
   top: 52px;
   right: 8px;
   width: 320px;
@@ -861,5 +860,12 @@ ion-fab-button:active::part(native) {
 }
 
 .msg-badge {
-  background: #34c759 !important;
+  top: auto !important;
+  right: -2px !important;
+  bottom: -2px;
+  min-width: 10px;
+  height: 10px;
+  font-size: 7px;
+  line-height: 10px;
+  padding: 0 2px;
 }

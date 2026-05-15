@@ -12,7 +12,40 @@
 
 <ion-content class="ion-padding">
 
+  <input #cameraInput type="file" accept="image/*" capture="environment" (change)="onFileChange($event)" style="display:none">
+  <input #fileInput type="file" accept="image/*" (change)="onFileChange($event)" style="display:none">
+
+  <!-- Upload Card -->
   <div class="upload-card">
+
+    <!-- Camera Viewfinder (PC) -->
+    <div class="camera-overlay" *ngIf="cameraActive">
+      <div class="camera-viewfinder">
+        <video #videoRef autoplay playsinline class="camera-video" *ngIf="!capturedImageUrl"></video>
+        <img *ngIf="capturedImageUrl" [src]="capturedImageUrl" class="camera-video captured" />
+      </div>
+      <div class="camera-controls">
+        <ng-container *ngIf="!capturedImageUrl">
+          <ion-button class="cam-cancel-btn" (click)="cancelCamera()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+          <ion-button class="cam-shoot-btn" (click)="capturePhoto()">
+            <div class="shoot-ring"></div>
+          </ion-button>
+          <div class="cam-spacer"></div>
+        </ng-container>
+        <ng-container *ngIf="capturedImageUrl">
+          <ion-button class="cam-retake-btn" (click)="retakePhoto()">
+            <ion-icon name="close-outline"></ion-icon>
+            Rehacer
+          </ion-button>
+          <ion-button class="cam-accept-btn" (click)="acceptPhoto()">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            Usar foto
+          </ion-button>
+        </ng-container>
+      </div>
+    </div>
 
     <!-- Drop Zone -->
     <div

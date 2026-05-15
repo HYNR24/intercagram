@@ -25,10 +25,16 @@ class PostController extends Controller
         })
         ->push($userId);
 
-        return Post::with(['user.profile', 'likes', 'comments.user.profile'])
+        $posts = Post::with(['user.profile', 'likes', 'comments.user.profile'])
             ->whereIn('user_id', $friendIds)
             ->latest()
             ->paginate(20);
+
+        $posts->each(function ($post) use ($userId) {
+            $post->liked_by_me = $post->likes->contains('user_id', $userId);
+        });
+
+        return $posts;
     }
 
     public function store(Request $request)
@@ -64,7 +70,9 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        return $post->load(['user.profile','comments.user.profile','likes']);
+        $post->load(['user.profile','comments.user.profile','likes']);
+        $post->liked_by_me = $post->likes->contains('user_id', request()->user()->id);
+        return $post;
     }
 
     public function destroy(Post $post, Request $request)

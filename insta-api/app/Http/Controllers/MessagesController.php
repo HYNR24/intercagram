@@ -91,15 +91,6 @@ class MessagesController extends Controller
             'content' => $request->content,
         ]);
 
-        Notification::create([
-            'user_id' => $otherUser->id,
-            'type' => 'new_message',
-            'data' => [
-                'username' => $request->user()->profile->username ?? $request->user()->name,
-                'preview' => mb_substr($request->content, 0, 50),
-            ],
-        ]);
-
         return response()->json($message->load('sender.profile', 'receiver.profile'), 201);
     }
 }

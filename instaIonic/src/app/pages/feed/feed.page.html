@@ -16,10 +16,10 @@
     </ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="goMessages()" class="msg-btn">
-        <ion-icon [icon]="icons.paper" slot="icon-only"></ion-icon>
+        <ion-icon [icon]="messageUnread > 0 ? icons.paperFilled : icons.paper" slot="icon-only"></ion-icon>
         <span class="notif-badge msg-badge" *ngIf="messageUnread > 0">{{ messageUnread > 9 ? '9+' : messageUnread }}</span>
       </ion-button>
-      <ion-button (click)="toggleNotifPanel()" class="notif-btn" id="notif-bell">
+      <ion-button (click)="toggleNotifPanel()" class="notif-btn">
         <ion-icon [icon]="unreadCount > 0 ? icons.notificationsFilled : icons.notifications" slot="icon-only"></ion-icon>
         <span class="notif-badge" *ngIf="unreadCount > 0">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
       </ion-button>
@@ -108,8 +108,8 @@
       </div>
 
       <div class="post-actions">
-        <ion-button fill="clear" size="small" (click)="like(p)" class="action-btn">
-          <ion-icon [icon]="p.likes?.length ? icons.heartFilled : icons.heartOutline" slot="icon-only"></ion-icon>
+        <ion-button fill="clear" size="small" (click)="like(p)" class="action-btn" [disabled]="postLikeLoading[p.id]">
+          <ion-icon [icon]="p.liked_by_me ? icons.heartFilled : icons.heartOutline" slot="icon-only" [style.color]="p.liked_by_me ? '#ed4956' : '#8e8e8e'"></ion-icon>
         </ion-button>
         <ion-button fill="clear" size="small" (click)="openComments(p)" class="action-btn">
           <ion-icon [icon]="icons.chat" slot="icon-only"></ion-icon>

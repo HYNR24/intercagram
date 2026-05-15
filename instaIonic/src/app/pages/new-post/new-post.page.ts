@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonButtons, IonBackButton, IonIcon, IonSpinner, ToastController, MenuController } from '@ionic/angular/standalone';
@@ -20,11 +20,20 @@ import { camera, closeOutline, imageOutline, cloudUpload, checkmarkCircle } from
 })
 export class NewPostPage {
 
+  @ViewChild('cameraInput') cameraInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('videoRef') videoRef!: ElementRef<HTMLVideoElement>;
+
   caption = '';
   file?: File;
   preview?: string;
   uploading = false;
   dragOver = false;
+
+  cameraActive = false;
+  capturedImageUrl: string | null = null;
+  private cameraStream: MediaStream | null = null;
+  private capturedCanvas: HTMLCanvasElement | null = null;
 
   constructor(
     private api: Api,
@@ -40,20 +49,78 @@ export class NewPostPage {
   }
 
   openCamera() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
-    input.onchange = (ev: any) => this.onFileChange(ev);
-    input.click();
+    if (this.isMobileDevice()) {
+      this.cameraInput.nativeElement.click();
+    } else {
+      this.startCamera();
+    }
   }
 
   pickFile() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (ev: any) => this.onFileChange(ev);
-    input.click();
+    this.fileInput.nativeElement.click();
+  }
+
+  private isMobileDevice(): boolean {
+    return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  private async startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      this.cameraStream = stream;
+      this.cameraActive = true;
+      this.capturedImageUrl = null;
+      this.capturedCanvas = null;
+      setTimeout(() => {
+        if (this.videoRef?.nativeElement) {
+          this.videoRef.nativeElement.srcObject = stream;
+        }
+      });
+    } catch {
+      this.cameraInput.nativeElement.click();
+    }
+  }
+
+  private stopCamera() {
+    if (this.cameraStream) {
+      this.cameraStream.getTracks().forEach(t => t.stop());
+      this.cameraStream = null;
+    }
+    this.cameraActive = false;
+    this.capturedImageUrl = null;
+    this.capturedCanvas = null;
+  }
+
+  capturePhoto() {
+    const video = this.videoRef?.nativeElement;
+    if (!video) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d')!.drawImage(video, 0, 0);
+    this.capturedCanvas = canvas;
+    this.capturedImageUrl = canvas.toDataURL('image/jpeg', 0.92);
+  }
+
+  retakePhoto() {
+    this.capturedCanvas = null;
+    this.capturedImageUrl = null;
+  }
+
+  acceptPhoto() {
+    if (!this.capturedCanvas) return;
+    this.capturedCanvas.toBlob((blob) => {
+      if (!blob) return;
+      const f = new File([blob], 'camera_photo.jpg', { type: 'image/jpeg' });
+      this.file = f;
+      if (this.preview) URL.revokeObjectURL(this.preview);
+      this.preview = URL.createObjectURL(f);
+      this.stopCamera();
+    }, 'image/jpeg', 0.92);
+  }
+
+  cancelCamera() {
+    this.stopCamera();
   }
 
   onFileChange(ev: any) {

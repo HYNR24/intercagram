@@ -29,7 +29,7 @@
     <ion-spinner></ion-spinner>
   </div>
 
-  <div class="messages-container" *ngIf="!loading" #scrollAnchor>
+  <div class="messages-container" *ngIf="!loading">
     <div
       class="message-row"
       *ngFor="let m of messages"
@@ -45,6 +45,7 @@
       <p>No hay mensajes aún</p>
       <p class="hint">Envía el primer mensaje</p>
     </div>
+
   </div>
 
   <div class="input-bar">

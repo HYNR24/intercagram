@@ -34,6 +34,7 @@
           {{ n.type === 'comment' ? 'comentó tu publicación' : '' }}
           {{ n.type === 'friend_request' ? 'te envió una solicitud de amistad' : '' }}
           {{ n.type === 'friend_accepted' ? 'aceptó tu solicitud de amistad' : '' }}
+          {{ n.type === 'comment_like' ? 'le dio like a tu comentario' : '' }}
         </p>
         <span class="notif-time">{{ timeAgo(n.created_at) }}</span>
       </div>

@@ -11,23 +11,34 @@ class LikeController extends Controller
 {
     public function like(Post $post, Request $request)
     {
-        $like = Like::firstOrCreate([
-            'user_id' => $request->user()->id,
-            'post_id' => $post->id,
-        ]);
+        $userId = $request->user()->id;
+        $like = Like::where('user_id', $userId)
+            ->where('post_id', $post->id)
+            ->first();
 
-        if ($like->wasRecentlyCreated && $post->user_id !== $request->user()->id) {
-            Notification::create([
-                'user_id' => $post->user_id,
-                'type' => 'like',
-                'data' => [
-                    'username' => $request->user()->profile->username ?? $request->user()->name,
-                    'post_id' => $post->id,
-                ],
-            ]);
+        if ($like) {
+            $like->delete();
+            $liked = false;
+        } else {
+            Like::create(['user_id' => $userId, 'post_id' => $post->id]);
+
+            if ($post->user_id !== $userId) {
+                Notification::create([
+                    'user_id' => $post->user_id,
+                    'type' => 'like',
+                    'data' => [
+                        'username' => $request->user()->profile->username ?? $request->user()->name,
+                        'post_id' => $post->id,
+                    ],
+                ]);
+            }
+            $liked = true;
         }
 
-        return response()->json(['liked'=>true]);
+        return response()->json([
+            'liked' => $liked,
+            'likes_count' => $post->likes()->count(),
+        ]);
     }
 
     public function unlike(Post $post, Request $request)

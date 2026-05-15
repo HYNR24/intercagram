@@ -9,14 +9,13 @@ import {
 } from '@ionic/angular/standalone';
 import {
   cameraOutline, heartOutline, heart,
-  chatbubbleOutline, paperPlaneOutline,
+  chatbubbleOutline, paperPlaneOutline, paperPlane,
   personAdd, closeOutline, searchOutline,
   chevronBackOutline, chevronForwardOutline,
   checkmarkCircle, personRemove,
   logOutOutline, addOutline, menuOutline,
   notificationsOutline, notifications,
-  personAddOutline, personOutline,
-  mailOutline, arrowForwardOutline
+  personOutline, arrowForwardOutline
 } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Api } from '../../services/api';
@@ -59,6 +58,7 @@ export class FeedPage implements OnInit, OnDestroy {
   private viewerInterval: any = null;
 
   followLoading: { [key: string]: boolean } = {};
+  postLikeLoading: { [key: number]: boolean } = {};
   commentLikeLoading: { [key: number]: boolean } = {};
   searchLoading = false;
   unreadCount = 0;
@@ -76,6 +76,7 @@ export class FeedPage implements OnInit, OnDestroy {
     heartOutline,
     chat: chatbubbleOutline,
     paper: paperPlaneOutline,
+    paperFilled: paperPlane,
     person: personAdd,
     close: closeOutline,
     chevronBack: chevronBackOutline,
@@ -86,10 +87,8 @@ export class FeedPage implements OnInit, OnDestroy {
     add: addOutline,
     notifications: notificationsOutline,
     notificationsFilled: notifications,
-    personAdd: personAddOutline,
     personCheck: personOutline,
-    mailOutline,
-    arrowForward: arrowForwardOutline
+    arrowForward: arrowForwardOutline,
   };
 
   constructor(
@@ -129,17 +128,56 @@ export class FeedPage implements OnInit, OnDestroy {
   pollMessageUnread() {
     this.api.getConversations().subscribe({
       next: (res: any[]) => {
-        this.messageUnread = res.filter(c => c.unread_count > 0).length;
+        this.messageUnread = res.filter((c: any) => c.unread > 0).length;
       },
       error: () => {}
     });
   }
 
+  load() {
+    this.api.getFeed().subscribe(res => {
+      const data = res.data ?? res;
+      this.posts = data;
+      const seen = new Set();
+      this.storyUsers = data
+        .map((p: any) => p.user)
+        .filter((u: any) => {
+          if (!u || seen.has(u.id)) return false;
+          seen.add(u.id);
+          return true;
+        });
+    });
+    this.api.getMe().subscribe(res => this.currentUser = res);
+  }
+
+  like(p: any) {
+    if (this.postLikeLoading[p.id]) return;
+    this.postLikeLoading[p.id] = true;
+    this.api.likePost(p.id).subscribe({
+      next: (res: any) => {
+        p.liked_by_me = res.liked;
+        if (!p.likes) p.likes = [];
+        p.likes.length = res.likes_count;
+        this.postLikeLoading[p.id] = false;
+      },
+      error: () => this.postLikeLoading[p.id] = false
+    });
+  }
+
+  openMenu() {
+    this.menuCtrl.open();
+  }
+
+  goNewPost() { this.router.navigateByUrl('/new-post'); }
+  goFriends() { this.router.navigateByUrl('/friends'); }
+  goMessages() { this.router.navigateByUrl('/messages'); }
+  goToProfile() { this.router.navigateByUrl('/profile'); }
+  goNotifications() { this.router.navigateByUrl('/notifications'); }
+  toggleSearch() { this.showSearchbar = !this.showSearchbar; }
+
   loadNotifList() {
     this.api.getNotifications().subscribe({
-      next: (res: any[]) => {
-        this.notifList = res.slice(0, 10);
-      },
+      next: (res: any[]) => { this.notifList = res.slice(0, 10); },
       error: () => {}
     });
   }
@@ -157,7 +195,7 @@ export class FeedPage implements OnInit, OnDestroy {
     switch (type) {
       case 'like': return heartOutline;
       case 'comment': return chatbubbleOutline;
-      case 'friend_request': return personAddOutline;
+      case 'friend_request': return personAdd;
       case 'friend_accepted': return personOutline;
       default: return notificationsOutline;
     }
@@ -193,37 +231,6 @@ export class FeedPage implements OnInit, OnDestroy {
       this.router.navigateByUrl('/feed');
     }
   }
-
-  load() {
-    this.api.getFeed().subscribe(res => {
-      const data = res.data ?? res;
-      this.posts = data;
-      const seen = new Set();
-      this.storyUsers = data
-        .map((p: any) => p.user)
-        .filter((u: any) => {
-          if (!u || seen.has(u.id)) return false;
-          seen.add(u.id);
-          return true;
-        });
-    });
-    this.api.getMe().subscribe(res => this.currentUser = res);
-  }
-
-  like(p: any) {
-    this.api.likePost(p.id).subscribe(() => this.load());
-  }
-
-  openMenu() {
-    this.menuCtrl.open();
-  }
-
-  goNewPost() { this.router.navigateByUrl('/new-post'); }
-  goFriends() { this.router.navigateByUrl('/friends'); }
-  goMessages() { this.router.navigateByUrl('/messages'); }
-  goToProfile() { this.router.navigateByUrl('/profile'); }
-  goNotifications() { this.router.navigateByUrl('/notifications'); }
-  toggleSearch() { this.showSearchbar = !this.showSearchbar; }
 
   imgUrl(path: string) { return this.base + path; }
 

@@ -7,7 +7,7 @@ import {
 import { Router, RouterModule } from '@angular/router';
 import { Api } from '../../services/api';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, notifications, notificationsOffOutline, personOutline, heartOutline, chatbubbleOutline, personAddOutline, mailOutline } from 'ionicons/icons';
+import { arrowBackOutline, notifications, notificationsOffOutline, personOutline, heartOutline, chatbubbleOutline, personAddOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-notifications',
@@ -32,7 +32,7 @@ export class NotificationsPage implements OnInit, OnDestroy {
     private router: Router,
     private menuCtrl: MenuController,
   ) {
-    addIcons({ arrowBackOutline, notifications, notificationsOffOutline, personOutline, heartOutline, chatbubbleOutline, personAddOutline, mailOutline });
+    addIcons({ arrowBackOutline, notifications, notificationsOffOutline, personOutline, heartOutline, chatbubbleOutline, personAddOutline });
   }
 
   ngOnInit() {
@@ -79,8 +79,6 @@ export class NotificationsPage implements OnInit, OnDestroy {
       this.router.navigateByUrl('/profile/' + n.data?.username);
     } else if (n.type === 'like' || n.type === 'comment' || n.type === 'comment_like') {
       this.router.navigateByUrl('/feed');
-    } else if (n.type === 'new_message') {
-      this.router.navigateByUrl('/chat/' + n.data?.username);
     }
   }
 
@@ -102,7 +100,6 @@ export class NotificationsPage implements OnInit, OnDestroy {
       case 'comment_like': return 'heart-outline';
       case 'friend_request': return 'person-add-outline';
       case 'friend_accepted': return 'person-outline';
-      case 'new_message': return 'mail-outline';
       default: return 'notifications-outline';
     }
   }

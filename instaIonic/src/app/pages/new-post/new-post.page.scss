@@ -9,6 +9,7 @@ ion-content {
   flex-direction: column;
   gap: 16px;
   animation: fadeUp 0.3s ease;
+  position: relative;
 }
 
 /* Drop Zone */
@@ -160,6 +161,117 @@ ion-content {
   --background: var(--inter-gradient);
   --box-shadow: 0 4px 16px rgba(108, 60, 225, 0.35);
   margin: 0;
+}
+
+/* Camera Overlay */
+.camera-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+  min-height: 400px;
+}
+
+.camera-viewfinder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.camera-video.captured {
+  object-fit: contain;
+  background: #000;
+}
+
+.camera-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 16px 24px 24px;
+  background: #000;
+}
+
+.cam-cancel-btn {
+  --color: #fff;
+  --background: rgba(255,255,255,0.15);
+  --border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+.cam-cancel-btn ion-icon {
+  font-size: 24px;
+}
+
+.cam-shoot-btn {
+  --background: transparent;
+  --border-radius: 50%;
+  --box-shadow: none;
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 72px;
+  height: 72px;
+  position: relative;
+}
+
+.shoot-ring {
+  width: 64px;
+  height: 64px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+
+.cam-shoot-btn:active .shoot-ring {
+  transform: scale(0.85);
+}
+
+.cam-spacer {
+  width: 48px;
+}
+
+.cam-retake-btn {
+  --color: #fff;
+  --background: rgba(255,255,255,0.15);
+  --border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.cam-retake-btn ion-icon {
+  margin-right: 6px;
+  font-size: 18px;
+}
+
+.cam-accept-btn {
+  --color: #fff;
+  --background: var(--inter-gradient, linear-gradient(135deg, #6c3ce1, #e14c8a));
+  --border-radius: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.cam-accept-btn ion-icon {
+  margin-right: 6px;
+  font-size: 18px;
 }
 
 /* Animation */

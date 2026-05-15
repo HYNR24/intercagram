@@ -10,6 +10,7 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         return Notification::where('user_id', $request->user()->id)
+            ->where('type', '!=', 'new_message')
             ->latest()
             ->get();
     }
@@ -18,6 +19,7 @@ class NotificationController extends Controller
     {
         $count = Notification::where('user_id', $request->user()->id)
             ->whereNull('read_at')
+            ->where('type', '!=', 'new_message')
             ->count();
 
         return response()->json(['count' => $count]);
