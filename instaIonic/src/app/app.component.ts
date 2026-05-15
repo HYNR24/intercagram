@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { IonApp, IonRouterOutlet, IonMenu, IonContent, IonButton, IonIcon, IonAvatar } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, IonMenu, IonContent, IonButton, IonIcon, IonAvatar, MenuController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { home, chatbubbles, people, person, addCircle, logOutOutline, chevronForward, menuOutline } from 'ionicons/icons';
 import { Auth } from './services/auth';
@@ -35,6 +35,7 @@ export class AppComponent implements OnInit {
     private router: Router,
     private auth: Auth,
     private api: Api,
+    private menuCtrl: MenuController,
   ) {
     addIcons({ home, chatbubbles, people, person, addCircle, logOutOutline, chevronForward, menuOutline });
     this.currentUrl = this.router.url;
@@ -61,6 +62,7 @@ export class AppComponent implements OnInit {
   }
 
   navigate(route: string) {
+    this.menuCtrl.close();
     this.router.navigateByUrl(route);
   }
 
