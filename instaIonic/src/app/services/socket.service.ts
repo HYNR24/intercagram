@@ -13,28 +13,30 @@ export class SocketService {
 
   connect(token: string) {
     if (this.socket?.connected) return;
-    this.socket = io('https://20.151.96.66', {
-      auth: { token },
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 3000,
-      timeout: 10000
-    });
-    this.socket.on('connect', () => {
-      this.connected = true;
-      this.connectedSubject.next(true);
-    });
-    this.socket.on('disconnect', () => {
-      this.connected = false;
-      this.connectedSubject.next(false);
-    });
-    this.socket.on('new-message', (data: any) => {
-      this.messageSubject.next(data);
-    });
-    this.socket.on('connect_error', () => {
-      this.connected = false;
-    });
+    try {
+      this.socket = io('https://20.151.96.66', {
+        auth: { token },
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionAttempts: 2,
+        reconnectionDelay: 5000,
+        timeout: 5000
+      });
+      this.socket.on('connect', () => {
+        this.connected = true;
+        this.connectedSubject.next(true);
+      });
+      this.socket.on('disconnect', () => {
+        this.connected = false;
+        this.connectedSubject.next(false);
+      });
+      this.socket.on('new-message', (data: any) => {
+        this.messageSubject.next(data);
+      });
+      this.socket.on('connect_error', () => {
+        this.connected = false;
+      });
+    } catch {}
   }
 
   disconnect() {
