@@ -14,31 +14,31 @@ class MessagesController extends Controller
     {
         $userId = $request->user()->id;
 
-        $conversations = Message::where('sender_id', $userId)
+        $messages = Message::where('sender_id', $userId)
             ->orWhere('receiver_id', $userId)
-            ->get()
-            ->groupBy(function ($msg) use ($userId) {
-                return $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id;
-            })
-            ->map(function ($messages) use ($userId) {
-                $otherUserId = $messages->first()->sender_id === $userId
-                    ? $messages->first()->receiver_id
-                    : $messages->first()->sender_id;
+            ->latest('created_at')
+            ->take(200)
+            ->get(['sender_id', 'receiver_id', 'content', 'read_at', 'created_at']);
 
-                $lastMsg = $messages->sortByDesc('created_at')->first();
-                $unread = $messages->where('receiver_id', $userId)->whereNull('read_at')->count();
-                $user = User::with('profile')->find($otherUserId);
+        $grouped = $messages->groupBy(function ($msg) use ($userId) {
+            return $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id;
+        });
 
-                return [
-                    'user' => $user,
-                    'last_message' => $lastMsg,
-                    'unread' => $unread,
-                ];
-            })
-            ->sortByDesc(function ($conv) {
-                return $conv['last_message']->created_at;
-            })
-            ->values();
+        $userIds = $grouped->keys();
+        $users = User::with('profile')->whereIn('id', $userIds)->get()->keyBy('id');
+
+        $conversations = $grouped->map(function ($msgs, $otherUserId) use ($userId, $users) {
+            $lastMsg = $msgs->sortByDesc('created_at')->first();
+            $unread = $msgs->where('receiver_id', $userId)->whereNull('read_at')->count();
+
+            return [
+                'user' => $users->get($otherUserId),
+                'last_message' => $lastMsg,
+                'unread' => $unread,
+            ];
+        })
+        ->sortByDesc(fn($conv) => $conv['last_message']->created_at)
+        ->values();
 
         return response()->json($conversations);
     }
