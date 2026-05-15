@@ -2,100 +2,168 @@ ion-content {
   --background: var(--inter-bg-primary);
 }
 
-.camera-view {
-  position: relative;
-  width: 100%;
-  height: 70vh;
-  background: #000;
-  border-radius: var(--inter-radius-md);
-  overflow: hidden;
+.upload-card {
+  max-width: 460px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  animation: fadeUp 0.3s ease;
 }
 
-.camera-video {
-  flex: 1;
-  width: 100%;
-  object-fit: cover;
-}
-
-.camera-controls {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+/* Drop Zone */
+.drop-zone {
+  border: 2px dashed var(--inter-border);
+  border-radius: 16px;
+  min-height: 220px;
   display: flex;
-  justify-content: space-around;
   align-items: center;
-  padding: 20px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: var(--inter-bg-card);
+  position: relative;
+  overflow: hidden;
 }
 
-.capture-btn {
-  --border-radius: 50%;
-  width: 64px;
-  height: 64px;
-  --padding-start: 0;
-  --padding-end: 0;
-  --background: rgba(255,255,255,0.2);
-  border: 3px solid #fff;
+.drop-zone:hover {
+  border-color: var(--inter-accent);
+  background: rgba(108, 60, 225, 0.04);
 }
 
-.capture-btn ion-icon {
-  color: #fff;
-  font-size: 28px;
+.drop-zone.drag-over {
+  border-color: var(--inter-accent);
+  background: rgba(108, 60, 225, 0.08);
+  transform: scale(1.01);
 }
 
-.camera-controls ion-button {
+.drop-zone.has-file {
+  border-style: solid;
+  border-color: var(--inter-border-light);
+  cursor: default;
+  min-height: auto;
+}
+
+.drop-placeholder {
+  text-align: center;
+  padding: 32px;
+}
+
+.drop-icon {
+  font-size: 52px;
+  color: var(--inter-text-muted);
+  opacity: 0.4;
+  margin-bottom: 12px;
+}
+
+.drop-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--inter-text-secondary);
+  margin: 0 0 4px;
+}
+
+.drop-hint {
+  font-size: 13px;
+  color: var(--inter-text-muted);
+  margin: 0;
+}
+
+/* Preview */
+.preview-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.preview-image {
+  width: 100%;
+  max-height: 50vh;
+  object-fit: contain;
+  display: block;
+  border-radius: 14px;
+  background: #000;
+}
+
+.preview-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.remove-btn {
   --color: #fff;
+  --background: rgba(0,0,0,0.5);
+  --border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  backdrop-filter: blur(4px);
 }
 
-.action-grid {
+.remove-btn ion-icon {
+  font-size: 20px;
+}
+
+/* Caption */
+.caption-input {
+  --background: var(--inter-bg-card);
+  --color: var(--inter-text-primary);
+  --placeholder-color: var(--inter-text-muted);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --border-radius: 12px;
+  border: 1px solid var(--inter-border);
+  border-radius: 12px;
+  min-height: 48px;
+}
+
+.caption-input.ion-disabled {
+  opacity: 0.5;
+}
+
+/* Action Row */
+.action-row {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
 }
 
-.action-grid ion-button {
+.action-btn {
   flex: 1;
-  --border-radius: var(--inter-radius-sm);
+  --border-radius: 12px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
   text-transform: none;
   font-weight: 600;
-  font-size: 13px;
-  --padding-top: 16px;
-  --padding-bottom: 16px;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.cam-btn {
+  --background: var(--inter-gradient);
+  --color: #fff;
+  --box-shadow: 0 4px 14px rgba(108, 60, 225, 0.3);
+}
+
+.file-btn {
   --background: var(--inter-bg-card);
   --color: var(--inter-text-primary);
   border: 1px solid var(--inter-border);
 }
 
-.caption-input {
-  --background: var(--inter-bg-card);
-  --border-radius: var(--inter-radius-sm);
-  --padding-start: 14px;
-  margin-bottom: 4px;
-  border: 1px solid var(--inter-border);
-  border-radius: var(--inter-radius-sm);
+.upload-btn {
+  --border-radius: 12px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  text-transform: none;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0;
+  --background: var(--inter-gradient);
+  --box-shadow: 0 4px 16px rgba(108, 60, 225, 0.35);
+  margin: 0;
 }
 
-.preview-img {
-  margin-top: 16px;
-  border-radius: var(--inter-radius-md);
-  overflow: hidden;
-  box-shadow: var(--inter-shadow);
-  border: 1px solid var(--inter-border-light);
-  animation: fadeIn 0.25s ease;
-}
-
-.preview-image {
-  width: 100%;
-  display: block;
-  max-height: 50vh;
-  object-fit: contain;
-  background: var(--inter-bg-primary);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+/* Animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }

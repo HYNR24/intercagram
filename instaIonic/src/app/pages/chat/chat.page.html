@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="openMenu()">
+        <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="chat-title">
+        <ion-avatar class="chat-title-avatar" *ngIf="otherUser?.profile?.avatar; else avatarFallback">
+          <img [src]="base + otherUser.profile.avatar" />
+        </ion-avatar>
+        <ng-template #avatarFallback>
+          <div class="chat-title-avatar chat-avatar-placeholder">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+        </ng-template>
+        <span>@{{ username }}</span>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="chat-content">
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div class="messages-container" *ngIf="!loading" #scrollAnchor>
+    <div
+      class="message-row"
+      *ngFor="let m of messages"
+      [class.mine]="isMine(m)"
+    >
+      <div class="message-bubble" [class.mine]="isMine(m)">
+        <span class="message-text">{{ m.content }}</span>
+        <span class="message-time">{{ m.created_at | date:'HH:mm' }}</span>
+      </div>
+    </div>
+
+    <div class="empty-chat" *ngIf="messages.length === 0">
+      <p>No hay mensajes aún</p>
+      <p class="hint">Envía el primer mensaje</p>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <ion-input
+      [(ngModel)]="newMessage"
+      placeholder="Escribe un mensaje..."
+      class="msg-input"
+      (keyup.enter)="send()"
+    ></ion-input>
+    <ion-button fill="clear" (click)="send()" [disabled]="sending || !newMessage.trim()" class="send-btn">
+      <ion-icon name="send-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
+</ion-content>

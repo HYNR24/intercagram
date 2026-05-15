@@ -1,58 +1,105 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Amigos</ion-title>
     <ion-buttons slot="start">
+      <ion-button (click)="openMenu()">
+        <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+      </ion-button>
       <ion-back-button defaultHref="/feed"></ion-back-button>
     </ion-buttons>
+    <ion-title>Amigos</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <!-- Solicitudes Pendientes -->
-  <div class="section">
-    <div class="section-header">
-      <h3>Solicitudes ({{ pending.length }})</h3>
-    </div>
-    <div class="user-item" *ngFor="let r of pending">
-      <div class="user-info">
-        <ion-avatar class="user-avatar">
-          <img [src]="r.user?.profile?.avatar ? base + r.user.profile.avatar : 'assets/icon/favicon.png'" />
-        </ion-avatar>
-        <div class="user-details">
-          <strong>{{ r.user?.profile?.username || r.user?.name }}</strong>
-        </div>
+  <!-- Stat Cards -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon pending-icon">
+        <ion-icon name="person-add-outline"></ion-icon>
       </div>
-      <ion-button size="small" color="primary" (click)="accept(r)">
-        Aceptar
-      </ion-button>
+      <div class="stat-info">
+        <span class="stat-number">{{ pending.length }}</span>
+        <span class="stat-label">Solicitudes</span>
+      </div>
     </div>
-    <div class="empty-state" *ngIf="pending.length === 0">
-      <p>No tienes solicitudes pendientes</p>
+    <div class="stat-card">
+      <div class="stat-icon friends-icon">
+        <ion-icon name="people-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-number">{{ friends.length }}</span>
+        <span class="stat-label">Siguiendo</span>
+      </div>
     </div>
   </div>
 
-  <!-- Siguiendo -->
-  <div class="section">
-    <div class="section-header">
-      <h3>Siguiendo ({{ friends.length }})</h3>
-    </div>
-    <div class="user-item" *ngFor="let f of friends">
-      <div class="user-info">
-        <ion-avatar class="user-avatar">
-          <img [src]="f.profile?.avatar ? base + f.profile.avatar : 'assets/icon/favicon.png'" />
+  <!-- Pending Requests -->
+  <div class="section-header" *ngIf="pending.length > 0">
+    <h3>Solicitudes pendientes</h3>
+  </div>
+  <div class="cards-grid" *ngIf="pending.length > 0">
+    <div class="friend-card" *ngFor="let r of pending">
+      <div class="card-top">
+        <ion-avatar class="card-avatar">
+          <img [src]="r.user?.profile?.avatar ? base + r.user.profile.avatar : 'assets/icon/favicon.png'" />
         </ion-avatar>
-        <div class="user-details">
-          <strong>{{ f.profile?.username || f.name }}</strong>
-          <span *ngIf="f.name && f.profile?.username">{{ f.name }}</span>
+        <div class="card-user">
+          <strong class="card-username">@{{ r.user?.profile?.username || r.user?.name }}</strong>
+          <span class="card-name" *ngIf="r.user?.name">{{ r.user.name }}</span>
+          <span class="card-bio" *ngIf="r.user?.profile?.bio">{{ r.user.profile.bio }}</span>
+          <span class="card-bio no-bio" *ngIf="!r.user?.profile?.bio">Sin descripción</span>
         </div>
       </div>
-      <ion-button size="small" color="medium" (click)="unfollow(f)">
-        Dejar de seguir
-      </ion-button>
-    </div>
-    <div class="empty-state" *ngIf="friends.length === 0">
-      <p>No sigues a nadie todavía</p>
-      <p>Busca usuarios en el feed para seguir sus publicaciones</p>
+      <div class="card-actions">
+        <ion-button size="small" color="primary" (click)="accept(r)" class="btn-accept">
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          Aceptar
+        </ion-button>
+        <ion-button size="small" color="danger" fill="outline" (click)="reject(r)" class="btn-reject" [disabled]="loadingReject.has(r.id)">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          {{ loadingReject.has(r.id) ? 'Rechazando...' : 'Rechazar' }}
+        </ion-button>
+      </div>
     </div>
   </div>
+
+  <!-- Friends / Following -->
+  <div class="section-header" *ngIf="friends.length > 0">
+    <h3>Siguiendo</h3>
+  </div>
+  <div class="cards-grid" *ngIf="friends.length > 0">
+    <div class="friend-card" *ngFor="let f of friends">
+      <div class="card-top">
+        <ion-avatar class="card-avatar">
+          <img [src]="f.profile?.avatar ? base + f.profile.avatar : 'assets/icon/favicon.png'" />
+        </ion-avatar>
+        <div class="card-user">
+          <strong class="card-username">@{{ f.profile?.username || f.name }}</strong>
+          <span class="card-name" *ngIf="f.name && f.profile?.username">{{ f.name }}</span>
+          <span class="card-bio" *ngIf="f.profile?.bio">{{ f.profile.bio }}</span>
+          <span class="card-bio no-bio" *ngIf="!f.profile?.bio">Sin descripción</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <ion-button size="small" color="primary" (click)="openChat(f.profile?.username)" class="btn-chat">
+          <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+          Mensaje
+        </ion-button>
+        <ion-button size="small" color="medium" (click)="unfollow(f)" class="btn-unfollow">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Dejar de seguir
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="pending.length === 0 && friends.length === 0">
+    <div class="empty-icon">
+      <ion-icon name="people-outline"></ion-icon>
+    </div>
+    <p>No tienes amigos todavía</p>
+    <p class="empty-hint">Busca usuarios en el feed para seguirlos</p>
+  </div>
+
 </ion-content>

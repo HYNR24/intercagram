@@ -1,110 +1,91 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, IonButtons, IonBackButton, IonIcon, ToastController } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonButtons, IonBackButton, IonIcon, IonSpinner, ToastController, MenuController } from '@ionic/angular/standalone';
 import { Api } from '../../services/api';
 import { Router } from '@angular/router';
 
 import { addIcons } from 'ionicons';
-import { camera, cameraReverse, closeOutline, fileTray, cloudUpload } from 'ionicons/icons';
+import { camera, closeOutline, imageOutline, cloudUpload, checkmarkCircle } from 'ionicons/icons';
 
 @Component({
   selector: 'app-new-post',
   templateUrl: './new-post.page.html',
   styleUrls: ['./new-post.page.scss'],
   standalone: true,
-  imports: [IonIcon, IonBackButton, IonHeader, 
-    IonToolbar, IonTitle, IonContent, IonItem, IonInput, IonButton, FormsModule, IonButtons, CommonModule
+  imports: [IonIcon, IonBackButton, IonHeader,
+    IonToolbar, IonTitle, IonContent, IonInput, IonButton, FormsModule, IonButtons, CommonModule,
+    IonSpinner
   ]
 })
 export class NewPostPage {
 
-  @ViewChild('videoEl') videoEl!: ElementRef<HTMLVideoElement>;
-  @ViewChild('canvasEl') canvasEl!: ElementRef<HTMLCanvasElement>;
-
   caption = '';
   file?: File;
   preview?: string;
-  showCamera = false;
   uploading = false;
-  facingMode: 'user' | 'environment' = 'environment';
-  private stream: MediaStream | null = null;
+  dragOver = false;
 
   constructor(
     private api: Api,
     private router: Router,
-    private toast: ToastController
+    private toast: ToastController,
+    private menuCtrl: MenuController,
   ) {
-    addIcons({camera, cameraReverse, closeOutline, fileTray, cloudUpload});
+    addIcons({ camera, closeOutline, imageOutline, cloudUpload, checkmarkCircle });
   }
 
-  async openCamera() {
-    this.showCamera = true;
-    setTimeout(() => this.startCamera(), 100);
+  openMenu() {
+    this.menuCtrl.open();
   }
 
-  private async startCamera() {
-    this.stopCamera();
-    try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: this.facingMode, width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-      if (this.videoEl?.nativeElement) {
-        this.videoEl.nativeElement.srcObject = this.stream;
-      }
-    } catch {
-      if (this.facingMode === 'environment') {
-        this.facingMode = 'user';
-        await this.startCamera();
-      }
-    }
+  openCamera() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = (ev: any) => this.onFileChange(ev);
+    input.click();
   }
 
-  flipCamera() {
-    this.facingMode = this.facingMode === 'environment' ? 'user' : 'environment';
-    this.startCamera();
-  }
-
-  capture() {
-    const video = this.videoEl?.nativeElement;
-    const canvas = this.canvasEl?.nativeElement;
-    if (!video || !canvas) return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    if (this.facingMode === 'user') {
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-    }
-    ctx.drawImage(video, 0, 0);
-
-    canvas.toBlob(blob => {
-      if (!blob) return;
-      this.file = new File([blob], 'camera.jpg', { type: 'image/jpeg' });
-      this.preview = URL.createObjectURL(blob);
-      this.closeCamera();
-    }, 'image/jpeg', 0.85);
-  }
-
-  closeCamera() {
-    this.stopCamera();
-    this.showCamera = false;
-  }
-
-  private stopCamera() {
-    if (this.stream) {
-      this.stream.getTracks().forEach(t => t.stop());
-      this.stream = null;
-    }
+  pickFile() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (ev: any) => this.onFileChange(ev);
+    input.click();
   }
 
   onFileChange(ev: any) {
-    const f = ev.target.files?.[0];
+    const f = ev.target?.files?.[0];
     if (!f) return;
     this.file = f;
+    if (this.preview) URL.revokeObjectURL(this.preview);
+    this.preview = URL.createObjectURL(f);
+  }
+
+  removeFile() {
+    if (this.preview) URL.revokeObjectURL(this.preview);
+    this.file = undefined;
+    this.preview = undefined;
+  }
+
+  onDragOver(e: DragEvent) {
+    e.preventDefault();
+    this.dragOver = true;
+  }
+
+  onDragLeave() {
+    this.dragOver = false;
+  }
+
+  onDrop(e: DragEvent) {
+    e.preventDefault();
+    this.dragOver = false;
+    const f = e.dataTransfer?.files?.[0];
+    if (!f || !f.type.startsWith('image/')) return;
+    this.file = f;
+    if (this.preview) URL.revokeObjectURL(this.preview);
     this.preview = URL.createObjectURL(f);
   }
 
@@ -127,7 +108,12 @@ export class NewPostPage {
       },
       error: async (err: any) => {
         this.uploading = false;
-        const msg = err?.error?.message || err?.message || 'Error al publicar. Intenta de nuevo.';
+        const body = err?.error;
+        let detail = '';
+        if (body?.errors) {
+          for (const k in body.errors) detail += body.errors[k].join(', ');
+        }
+        const msg = detail || body?.message || err?.message || 'Error al publicar. Intenta de nuevo.';
         const t = await this.toast.create({
           message: msg,
           duration: 3000,

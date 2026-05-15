@@ -9,6 +9,9 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommentLikeController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\FriendshipController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return response()->json([
@@ -45,6 +48,11 @@ Route::get('/', function () {
                 'POST /api/friendships/{id}/accept' => 'Aceptar solicitud (token requerido)',
                 'GET /api/friendships/pending'   => 'Solicitudes pendientes (token requerido)',
                 'GET /api/users/suggested'       => 'Usuarios sugeridos (token requerido)',
+            ],
+            'mensajes' => [
+                'GET /api/conversations'                 => 'Listar conversaciones (token requerido)',
+                'GET /api/conversations/{username}'      => 'Ver mensajes con usuario (token requerido)',
+                'POST /api/conversations/{username}'     => 'Enviar mensaje (token requerido)',
             ],
             'usuarios' => [
                 'GET /api/users/search?q='      => 'Buscar usuarios (token requerido)',
@@ -87,8 +95,24 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{username}/friend/cancel', [FriendshipController::class, 'cancel']);
     Route::get('/friends', [FriendshipController::class, 'myFriends']);
     Route::post('/friendships/{friendship}/accept', [FriendshipController::class, 'accept']);
+    Route::post('/friendships/{friendship}/reject', [FriendshipController::class, 'reject']);
     Route::get('/friendships/pending', [FriendshipController::class, 'pending']);
     Route::get('/users/suggested', [FriendshipController::class, 'suggested']);
+    Route::get('/users/{username}/friend/status', [FriendshipController::class, 'status']);
+
+    // notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead']);
+
+    // profile
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
+
+    // messages
+    Route::get('/conversations', [MessagesController::class, 'conversations']);
+    Route::get('/conversations/{username}', [MessagesController::class, 'messages']);
+    Route::post('/conversations/{username}', [MessagesController::class, 'send']);
 });
 
 Route::middleware('auth:sanctum')->post('/logout', function (\Illuminate\Http\Request $request) {

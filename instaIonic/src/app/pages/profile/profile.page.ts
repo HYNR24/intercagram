@@ -5,7 +5,7 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonAvatar, IonButton, IonButtons,
   IonInput, IonTextarea, IonIcon, IonSpinner,
-  IonItem, IonLabel
+  IonItem, IonLabel, MenuController
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { Api } from '../../services/api';
@@ -39,6 +39,7 @@ export class ProfilePage implements OnInit {
     private api: Api,
     private auth: Auth,
     private router: Router,
+    private menuCtrl: MenuController,
   ) {
     addIcons({ cameraOutline, logOutOutline, closeOutline, checkmarkCircle, personCircleOutline });
   }
@@ -77,8 +78,13 @@ export class ProfilePage implements OnInit {
         this.message = 'Foto actualizada';
         this.saving = false;
       },
-      error: () => {
-        this.message = 'Error al subir foto';
+      error: (err: any) => {
+        const body = err?.error;
+        let detail = '';
+        if (body?.errors) {
+          for (const k in body.errors) detail += body.errors[k].join(', ');
+        }
+        this.message = detail || body?.message || 'Error al subir foto';
         this.saving = false;
       }
     });
@@ -98,6 +104,10 @@ export class ProfilePage implements OnInit {
         this.saving = false;
       }
     });
+  }
+
+  openMenu() {
+    this.menuCtrl.open();
   }
 
   goBack() {

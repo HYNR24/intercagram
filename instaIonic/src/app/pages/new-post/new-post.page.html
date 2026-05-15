@@ -1,54 +1,77 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Nuevo post</ion-title>
     <ion-buttons slot="start">
+      <ion-button (click)="openMenu()">
+        <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+      </ion-button>
       <ion-back-button defaultHref="/feed"></ion-back-button>
-    </ion-buttons>  
+    </ion-buttons>
+    <ion-title>Nuevo post</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
 
-  <div class="camera-view" *ngIf="showCamera">
-    <video #videoEl autoplay playsinline class="camera-video"></video>
-    <canvas #canvasEl hidden></canvas>
-    <div class="camera-controls">
-      <ion-button fill="clear" (click)="flipCamera()">
-        <ion-icon name="camera-reverse" size="large"></ion-icon>
-      </ion-button>
-      <ion-button fill="solid" color="primary" (click)="capture()" class="capture-btn">
-        <ion-icon name="camera" size="large"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" (click)="closeCamera()">
-        <ion-icon name="close-outline" size="large"></ion-icon>
-      </ion-button>
+  <div class="upload-card">
+
+    <!-- Drop Zone -->
+    <div
+      class="drop-zone"
+      [class.has-file]="!!file"
+      [class.drag-over]="dragOver"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+      (click)="!file && pickFile()"
+    >
+      <ng-container *ngIf="!file; else previewBlock">
+        <div class="drop-placeholder">
+          <ion-icon name="image-outline" class="drop-icon"></ion-icon>
+          <p class="drop-text">Arrastra una imagen aquí</p>
+          <p class="drop-hint">o presiona para seleccionar</p>
+        </div>
+      </ng-container>
+
+      <ng-template #previewBlock>
+        <div class="preview-wrapper">
+          <img [src]="preview" class="preview-image" />
+          <div class="preview-overlay">
+            <ion-button fill="clear" class="remove-btn" (click)="removeFile(); $event.stopPropagation()">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ng-template>
     </div>
-  </div>
 
-  <ng-container *ngIf="!showCamera">
-    <ion-item class="caption-input">
-      <ion-input label="Descripción" [(ngModel)]="caption"></ion-input>
-    </ion-item>
+    <!-- Caption -->
+    <ion-input
+      class="caption-input"
+      [(ngModel)]="caption"
+      placeholder="Escribe una descripción..."
+      [disabled]="!file"
+    ></ion-input>
 
-    <div class="action-grid">
-      <ion-button (click)="openCamera()">
+    <!-- Actions -->
+    <div class="action-row" *ngIf="!file">
+      <ion-button (click)="openCamera()" class="action-btn cam-btn">
         <ion-icon name="camera" slot="start"></ion-icon>
         Cámara
       </ion-button>
-      <ion-button (click)="fileInput.click()">
-        <ion-icon name="file-tray" slot="start"></ion-icon>
-        Archivo
-      </ion-button>
-      <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)" />
-      <ion-button (click)="upload()" [disabled]="uploading">
-        <ion-icon name="cloud-upload" slot="start"></ion-icon>
-        {{ uploading ? '...' : 'Publicar' }}
+      <ion-button (click)="pickFile()" class="action-btn file-btn">
+        <ion-icon name="image-outline" slot="start"></ion-icon>
+        Galería
       </ion-button>
     </div>
 
-    <div class="preview-img" *ngIf="preview">
-      <img [src]="preview" class="preview-image" />
+    <div class="action-row" *ngIf="file">
+      <ion-button (click)="upload()" [disabled]="uploading" class="upload-btn" expand="block">
+        <ion-spinner *ngIf="uploading" slot="start"></ion-spinner>
+        <ion-icon *ngIf="!uploading" name="cloud-upload" slot="start"></ion-icon>
+        {{ uploading ? 'Publicando...' : 'Publicar' }}
+      </ion-button>
     </div>
-  </ng-container>
+
+  </div>
 
 </ion-content>

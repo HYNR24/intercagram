@@ -34,11 +34,24 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'image' => 'required|image|max:2048',
+            'image' => 'required|file|mimes:jpg,jpeg,png,gif,webp,bmp,tiff,heic,heif|max:20480',
             'caption' => 'nullable|string'
         ]);
 
-        $path = $request->file('image')->store('posts', 'public');
+        $file = $request->file('image');
+        $path = $file->store('posts', 'public');
+        $fullPath = storage_path('app/public/' . $path);
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        if (in_array($ext, ['heic', 'heif'])) {
+            $newPath = str_replace('.' . $ext, '.jpg', $path);
+            $newFullPath = storage_path('app/public/' . $newPath);
+            exec('heif-convert ' . escapeshellarg($fullPath) . ' ' . escapeshellarg($newFullPath) . ' 2>&1', $output, $exitCode);
+            if ($exitCode === 0 && file_exists($newFullPath)) {
+                unlink($fullPath);
+                $path = $newPath;
+            }
+        }
 
         $post = Post::create([
             'user_id' => $request->user()->id,

@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="openMenu()">
+        <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Notificaciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div class="notifications-list" *ngIf="!loading">
+    <div
+      class="notification-item"
+      *ngFor="let n of notifications"
+      [class.unread]="!n.read_at"
+      (click)="handleClick(n)"
+    >
+      <div class="notif-icon-wrapper">
+        <ion-icon [name]="iconFor(n.type)" class="notif-icon"></ion-icon>
+      </div>
+      <div class="notif-content">
+        <p class="notif-text">
+          <strong>{{ n.data?.username || 'Alguien' }}</strong>
+          {{ n.type === 'like' ? 'le dio like a tu publicación' : '' }}
+          {{ n.type === 'comment' ? 'comentó tu publicación' : '' }}
+          {{ n.type === 'friend_request' ? 'te envió una solicitud de amistad' : '' }}
+          {{ n.type === 'friend_accepted' ? 'aceptó tu solicitud de amistad' : '' }}
+        </p>
+        <span class="notif-time">{{ timeAgo(n.created_at) }}</span>
+      </div>
+      <div class="notif-dot" *ngIf="!n.read_at"></div>
+    </div>
+
+    <div class="empty-state" *ngIf="notifications.length === 0">
+      <div class="empty-icon">
+        <ion-icon name="notifications-off-outline"></ion-icon>
+      </div>
+      <h3>Sin notificaciones</h3>
+      <p>No tienes notificaciones nuevas</p>
+    </div>
+  </div>
+</ion-content>

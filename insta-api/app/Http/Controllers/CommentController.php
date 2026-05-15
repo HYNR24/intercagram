@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Comment;
+use App\Models\Notification;
 use App\Models\Post;
 
 class CommentController extends Controller
@@ -37,6 +38,17 @@ class CommentController extends Controller
             'post_id' => $post->id,
             'content' => $data['content'],
         ]);
+
+        if ($post->user_id !== $request->user()->id) {
+            Notification::create([
+                'user_id' => $post->user_id,
+                'type' => 'comment',
+                'data' => [
+                    'username' => $request->user()->profile->username ?? $request->user()->name,
+                    'post_id' => $post->id,
+                ],
+            ]);
+        }
 
         return $comment->load('user.profile');
     }

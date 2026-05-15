@@ -59,7 +59,7 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('mobile')->plainTextToken;
-        return response()->json(['user'=>$user,'token'=>$token]);
+        return response()->json(['user'=>$user->load('profile'),'token'=>$token]);
     }
 
     public function me(Request $request)

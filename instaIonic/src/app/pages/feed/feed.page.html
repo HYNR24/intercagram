@@ -1,5 +1,10 @@
 <ion-header *ngIf="!showViewer">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="openMenu()">
+        <ion-icon [icon]="icons.menu" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>
       <div class="title-content">
         <img src="assets/icon/logo.png" alt="Intercagram" class="title-logo" translate="no" />
@@ -10,17 +15,16 @@
       </div>
     </ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="goMessages()" class="msg-btn">
+        <ion-icon [icon]="icons.paper" slot="icon-only"></ion-icon>
+        <span class="notif-badge msg-badge" *ngIf="messageUnread > 0">{{ messageUnread > 9 ? '9+' : messageUnread }}</span>
+      </ion-button>
+      <ion-button (click)="toggleNotifPanel()" class="notif-btn" id="notif-bell">
+        <ion-icon [icon]="unreadCount > 0 ? icons.notificationsFilled : icons.notifications" slot="icon-only"></ion-icon>
+        <span class="notif-badge" *ngIf="unreadCount > 0">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+      </ion-button>
       <ion-button (click)="toggleSearch()">
         <ion-icon [icon]="icons.search" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button (click)="goMessages()">
-        <ion-icon [icon]="icons.messages" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button (click)="goFriends()">
-        <ion-icon [icon]="icons.person" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button (click)="logout()" class="logout-btn">
-        <ion-icon [icon]="icons.logout" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -226,7 +230,36 @@
     </div>
   </div>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="newpost-fab" *ngIf="!showViewer">
+  <!-- Notification Dropdown -->
+  <div class="notif-panel-overlay" *ngIf="showNotifPanel" (click)="closeNotifPanel()"></div>
+  <div class="notif-panel" *ngIf="showNotifPanel">
+    <div class="notif-panel-header">
+      <span class="notif-panel-title">Notificaciones</span>
+    </div>
+    <div class="notif-panel-list">
+      <div class="notif-panel-item" *ngFor="let n of notifList" [class.unread]="!n.read_at" (click)="handleNotifClick(n)">
+        <div class="notif-panel-icon">
+          <ion-icon [icon]="notifIcon(n.type)"></ion-icon>
+        </div>
+        <div class="notif-panel-content">
+          <p class="notif-panel-text">
+            <strong>{{ n.data?.username || 'Alguien' }}</strong> {{ notifText(n) }}
+          </p>
+          <span class="notif-panel-time">{{ notifTime(n.created_at) }}</span>
+        </div>
+        <div class="notif-panel-dot" *ngIf="!n.read_at"></div>
+      </div>
+      <div class="notif-panel-empty" *ngIf="notifList.length === 0">
+        Sin notificaciones
+      </div>
+    </div>
+    <div class="notif-panel-footer" (click)="showNotifPanel = false; goNotifications()">
+      <span>Ver todas</span>
+      <ion-icon [icon]="icons.arrowForward"></ion-icon>
+    </div>
+  </div>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="newpost-fab" *ngIf="!showViewer && !showComments">
     <ion-fab-button (click)="goNewPost()">
       <ion-icon [icon]="icons.add" class="fab-icon"></ion-icon>
     </ion-fab-button>

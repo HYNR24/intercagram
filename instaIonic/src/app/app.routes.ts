@@ -31,7 +31,15 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/messages/messages.page').then( m => m.MessagesPage)
   },
   {
+    path: 'notifications',
+    loadComponent: () => import('./pages/notifications/notifications.page').then( m => m.NotificationsPage)
+  },
+  {
     path: 'profile',
     loadComponent: () => import('./pages/profile/profile.page').then( m => m.ProfilePage)
+  },
+  {
+    path: 'chat/:username',
+    loadComponent: () => import('./pages/chat/chat.page').then( m => m.ChatPage)
   },
 ];

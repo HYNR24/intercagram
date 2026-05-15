@@ -1,20 +1,53 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="goBack()">
-        <ion-icon [icon]="icons.back" slot="icon-only"></ion-icon>
+      <ion-button (click)="openMenu()">
+        <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-title>Mensajes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="goNewChat()">
+        <ion-icon name="chatbubble-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="empty-state">
-    <div class="empty-icon">
-      <ion-icon [icon]="icons.back"></ion-icon>
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div class="conversations-list" *ngIf="!loading">
+    <div
+      class="conversation-item"
+      *ngFor="let c of conversations"
+      (click)="openChat(c.user?.profile?.username)"
+    >
+      <ion-avatar class="conv-avatar">
+        <img [src]="c.user?.profile?.avatar ? base + c.user.profile.avatar : 'assets/icon/favicon.png'" />
+      </ion-avatar>
+      <div class="conv-info">
+        <div class="conv-top">
+          <strong class="conv-username">@{{ c.user?.profile?.username || c.user?.name }}</strong>
+          <span class="conv-time">{{ timeAgo(c.last_message?.created_at) }}</span>
+        </div>
+        <div class="conv-bottom">
+          <span class="conv-preview">{{ c.last_message?.content }}</span>
+          <span class="conv-unread" *ngIf="c.unread > 0">{{ c.unread }}</span>
+        </div>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="conv-arrow"></ion-icon>
     </div>
-    <h3>Mensajes</h3>
-    <p>Próximamente podrás chatear con tus amigos</p>
+
+    <div class="empty-state" *ngIf="conversations.length === 0">
+      <div class="empty-icon">
+        <ion-icon name="chatbubble-outline"></ion-icon>
+      </div>
+      <h3>Sin conversaciones</h3>
+      <p>Busca amigos para iniciar un chat</p>
+      <ion-button color="primary" (click)="goNewChat()">Buscar amigos</ion-button>
+    </div>
   </div>
 </ion-content>

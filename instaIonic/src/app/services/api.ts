@@ -63,6 +63,10 @@ export class Api {
     return this.http.post(this.apiUrl + `friendships/${friendshipId}/accept`, {});
   }
 
+  rejectFriendship(friendshipId: number) {
+    return this.http.post(this.apiUrl + `friendships/${friendshipId}/reject`, {});
+  }
+
   getSuggestedUsers() {
     return this.http.get<any[]>(this.apiUrl + 'users/suggested');
   }
@@ -99,6 +103,30 @@ export class Api {
     const fd = new FormData();
     fd.append('avatar', file);
     return this.http.post<any>(this.apiUrl + 'profile/avatar', fd);
+  }
+
+  getNotifications() {
+    return this.http.get<any[]>(this.apiUrl + 'notifications');
+  }
+
+  getUnreadCount() {
+    return this.http.get<any>(this.apiUrl + 'notifications/unread-count');
+  }
+
+  markNotificationRead(id: number) {
+    return this.http.post(this.apiUrl + `notifications/${id}/read`, {});
+  }
+
+  getConversations() {
+    return this.http.get<any[]>(this.apiUrl + 'conversations');
+  }
+
+  getMessages(username: string) {
+    return this.http.get<any[]>(this.apiUrl + 'conversations/' + username);
+  }
+
+  sendMessage(username: string, content: string) {
+    return this.http.post<any>(this.apiUrl + 'conversations/' + username, { content });
   }
 
 }

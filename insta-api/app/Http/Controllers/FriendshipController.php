@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Friendship;
+use App\Models\Notification;
 use App\Models\User;
 use App\Models\Profile;
 
@@ -34,6 +35,14 @@ class FriendshipController extends Controller
         'status' => 'pending'
     ]);
 
+    Notification::create([
+        'user_id' => $user->id,
+        'type' => 'friend_request',
+        'data' => [
+            'username' => $request->user()->profile->username ?? $request->user()->name,
+        ],
+    ]);
+
     return $friendship;
 }
 
@@ -46,12 +55,30 @@ class FriendshipController extends Controller
 
         $friendship->update(['status'=>'accepted']);
 
+        Notification::create([
+            'user_id' => $friendship->user_id,
+            'type' => 'friend_accepted',
+            'data' => [
+                'username' => $request->user()->profile->username ?? $request->user()->name,
+            ],
+        ]);
+
         return $friendship;
     }
 
     public function myFriends(Request $request)
     {
-        return $request->user()->friends()->with('profile')->get();
+        $userId = $request->user()->id;
+
+        $friendIds = Friendship::where(function ($q) use ($userId) {
+            $q->where('user_id', $userId)->where('status', 'accepted');
+        })->orWhere(function ($q) use ($userId) {
+            $q->where('friend_id', $userId)->where('status', 'accepted');
+        })->get()->map(function ($f) use ($userId) {
+            return $f->user_id === $userId ? $f->friend_id : $f->user_id;
+        });
+
+        return User::with('profile')->whereIn('id', $friendIds)->get();
     }
 
     public function pending(Request $request)
@@ -76,6 +103,21 @@ class FriendshipController extends Controller
             ->whereNotIn('id', $friendIds)
             ->limit(10)
             ->get();
+    }
+
+    public function reject(Request $request, Friendship $friendship)
+    {
+        if ($friendship->friend_id !== $request->user()->id) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        if ($friendship->status !== 'pending') {
+            return response()->json(['message' => 'La solicitud ya fue procesada'], 400);
+        }
+
+        $friendship->delete();
+
+        return response()->json(['message' => 'Solicitud rechazada']);
     }
 
     public function cancel(Request $request, $username)
@@ -115,5 +157,32 @@ class FriendshipController extends Controller
         })->delete();
 
         return response()->json(['message' => 'Amigo eliminado']);
+    }
+
+    public function status(Request $request, $username)
+    {
+        $profile = Profile::where('username', $username)->first();
+
+        if (!$profile) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+
+        $friend = $profile->user;
+        $userId = $request->user()->id;
+
+        $friendship = Friendship::where(function ($q) use ($userId, $friend) {
+            $q->where('user_id', $userId)->where('friend_id', $friend->id);
+        })->orWhere(function ($q) use ($userId, $friend) {
+            $q->where('user_id', $friend->id)->where('friend_id', $userId);
+        })->first();
+
+        if (!$friendship) {
+            return response()->json(['status' => 'none']);
+        }
+
+        return response()->json([
+            'status' => $friendship->status,
+            'friendship_id' => $friendship->id,
+        ]);
     }
 }

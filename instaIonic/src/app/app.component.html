@@ -1,3 +1,57 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-menu contentId="main-content" side="start" type="push" class="app-menu">
+    <ion-content class="menu-content">
+      <div class="menu-profile" *ngIf="user">
+        <ion-avatar class="menu-avatar">
+          <img [src]="user.profile?.avatar ? base + user.profile.avatar : 'assets/icon/favicon.png'" />
+        </ion-avatar>
+        <span class="menu-username">@{{ user.profile?.username }}</span>
+        <span class="menu-name">{{ user.name }}</span>
+        <div class="menu-stats">
+          <div class="stat">
+            <span class="stat-value">{{ user.posts_count || 0 }}</span>
+            <span class="stat-label">publicaciones</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ user.followers_count || 0 }}</span>
+            <span class="stat-label">seguidores</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ user.following_count || 0 }}</span>
+            <span class="stat-label">siguiendo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-brand">
+        <span class="menu-brand-text" translate="no">INTERCAGRAM</span>
+      </div>
+
+      <div class="menu-buttons">
+        <ion-button
+          *ngFor="let p of pages"
+          expand="block"
+          class="menu-btn"
+          [class.menu-btn-active]="isActive(p.route)"
+          (click)="navigate(p.route)"
+        >
+          <ion-icon [icon]="p.icon" slot="start"></ion-icon>
+          {{ p.title }}
+        </ion-button>
+      </div>
+
+      <div class="menu-footer">
+        <ion-button
+          expand="block"
+          class="menu-btn menu-logout"
+          (click)="logout()"
+        >
+          <ion-icon [icon]="logOutIcon" slot="start"></ion-icon>
+          Cerrar sesión
+        </ion-button>
+      </div>
+    </ion-content>
+  </ion-menu>
+
+  <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>

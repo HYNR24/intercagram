@@ -1,11 +1,11 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonItem, IonAvatar, IonLabel, IonButton, IonButtons,
   IonInput, IonIcon, IonSearchbar, IonSpinner,
-  IonFab, IonFabButton
+  IonFab, IonFabButton, MenuController
 } from '@ionic/angular/standalone';
 import {
   cameraOutline, heartOutline, heart,
@@ -13,7 +13,10 @@ import {
   personAdd, closeOutline, searchOutline,
   chevronBackOutline, chevronForwardOutline,
   checkmarkCircle, personRemove,
-  logOutOutline, addOutline
+  logOutOutline, addOutline, menuOutline,
+  notificationsOutline, notifications,
+  personAddOutline, personOutline,
+  mailOutline, arrowForwardOutline
 } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Api } from '../../services/api';
@@ -31,7 +34,7 @@ import { Auth } from '../../services/auth';
     IonFab, IonFabButton
   ]
 })
-export class FeedPage implements OnInit {
+export class FeedPage implements OnInit, OnDestroy {
 
   posts: any[] = [];
   storyUsers: any[] = [];
@@ -58,9 +61,15 @@ export class FeedPage implements OnInit {
   followLoading: { [key: string]: boolean } = {};
   commentLikeLoading: { [key: number]: boolean } = {};
   searchLoading = false;
+  unreadCount = 0;
+  messageUnread = 0;
+  notifList: any[] = [];
+  showNotifPanel = false;
+  private pollInterval: any = null;
 
   icons = {
     camera: cameraOutline,
+    menu: menuOutline,
     search: searchOutline,
     messages: paperPlaneOutline,
     heartFilled: heart,
@@ -74,16 +83,116 @@ export class FeedPage implements OnInit {
     checkmark: checkmarkCircle,
     personRemove,
     logout: logOutOutline,
-    add: addOutline
+    add: addOutline,
+    notifications: notificationsOutline,
+    notificationsFilled: notifications,
+    personAdd: personAddOutline,
+    personCheck: personOutline,
+    mailOutline,
+    arrowForward: arrowForwardOutline
   };
 
   constructor(
     private api: Api,
     private router: Router,
     private auth: Auth,
+    private menuCtrl: MenuController,
   ) {}
 
-  ngOnInit() { this.load(); }
+  ngOnInit() {
+    this.load();
+    this.pollUnread();
+    this.pollMessageUnread();
+    this.pollInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        this.pollUnread();
+        this.pollMessageUnread();
+        if (this.showNotifPanel) this.loadNotifList();
+      }
+    }, 5000);
+  }
+
+  ngOnDestroy() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
+  }
+
+  pollUnread() {
+    this.api.getUnreadCount().subscribe({
+      next: (res: any) => this.unreadCount = res.count ?? res,
+      error: () => {}
+    });
+  }
+
+  pollMessageUnread() {
+    this.api.getConversations().subscribe({
+      next: (res: any[]) => {
+        this.messageUnread = res.filter(c => c.unread_count > 0).length;
+      },
+      error: () => {}
+    });
+  }
+
+  loadNotifList() {
+    this.api.getNotifications().subscribe({
+      next: (res: any[]) => {
+        this.notifList = res.slice(0, 10);
+      },
+      error: () => {}
+    });
+  }
+
+  toggleNotifPanel() {
+    this.showNotifPanel = !this.showNotifPanel;
+    if (this.showNotifPanel) this.loadNotifList();
+  }
+
+  closeNotifPanel() {
+    this.showNotifPanel = false;
+  }
+
+  notifIcon(type: string): any {
+    switch (type) {
+      case 'like': return heartOutline;
+      case 'comment': return chatbubbleOutline;
+      case 'friend_request': return personAddOutline;
+      case 'friend_accepted': return personOutline;
+      default: return notificationsOutline;
+    }
+  }
+
+  notifText(n: any): string {
+    switch (n.type) {
+      case 'like': return 'le dio like a tu publicación';
+      case 'comment': return 'comentó tu publicación';
+      case 'friend_request': return 'te envió una solicitud';
+      case 'friend_accepted': return 'aceptó tu solicitud';
+      default: return '';
+    }
+  }
+
+  notifTime(date: string): string {
+    const now = new Date();
+    const d = new Date(date);
+    const diff = Math.floor((now.getTime() - d.getTime()) / 1000);
+    if (diff < 60) return 'ahora';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd';
+    return d.toLocaleDateString();
+  }
+
+  handleNotifClick(n: any) {
+    this.api.markNotificationRead(n.id).subscribe();
+    this.showNotifPanel = false;
+    if (n.type === 'friend_request' || n.type === 'friend_accepted') {
+      this.router.navigateByUrl('/profile/' + n.data?.username);
+    } else {
+      this.router.navigateByUrl('/feed');
+    }
+  }
 
   load() {
     this.api.getFeed().subscribe(res => {
@@ -105,10 +214,15 @@ export class FeedPage implements OnInit {
     this.api.likePost(p.id).subscribe(() => this.load());
   }
 
+  openMenu() {
+    this.menuCtrl.open();
+  }
+
   goNewPost() { this.router.navigateByUrl('/new-post'); }
   goFriends() { this.router.navigateByUrl('/friends'); }
   goMessages() { this.router.navigateByUrl('/messages'); }
   goToProfile() { this.router.navigateByUrl('/profile'); }
+  goNotifications() { this.router.navigateByUrl('/notifications'); }
   toggleSearch() { this.showSearchbar = !this.showSearchbar; }
 
   imgUrl(path: string) { return this.base + path; }
@@ -185,12 +299,25 @@ export class FeedPage implements OnInit {
         error: () => this.followLoading[username] = false
       });
     } else if (user.friendship_status === 'pending') {
-      this.api.cancelFriendRequest(username).subscribe({
-        next: () => {
-          user.friendship_status = 'none';
+      this.api.getFriendshipStatus(username).subscribe({
+        next: (res: any) => {
+          if (res.status === 'none' || res.status === 'rejected') {
+            user.friendship_status = 'none';
+          } else {
+            this.api.cancelFriendRequest(username).subscribe({
+              next: () => { user.friendship_status = 'none'; },
+              error: () => {}
+            });
+          }
           this.followLoading[username] = false;
         },
-        error: () => this.followLoading[username] = false
+        error: () => {
+          this.api.cancelFriendRequest(username).subscribe({
+            next: () => { user.friendship_status = 'none'; },
+            error: () => {}
+          });
+          this.followLoading[username] = false;
+        }
       });
     } else if (user.friendship_status === 'accepted') {
       this.api.removeFriend(username).subscribe({
