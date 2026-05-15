@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\Profile;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class MessagesController extends Controller
@@ -88,6 +89,15 @@ class MessagesController extends Controller
             'sender_id' => $userId,
             'receiver_id' => $otherUser->id,
             'content' => $request->content,
+        ]);
+
+        Notification::create([
+            'user_id' => $otherUser->id,
+            'type' => 'new_message',
+            'data' => [
+                'username' => $request->user()->profile->username ?? $request->user()->name,
+                'preview' => mb_substr($request->content, 0, 50),
+            ],
         ]);
 
         return response()->json($message->load('sender.profile', 'receiver.profile'), 201);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\CommentLike;
 use App\Models\Comment;
+use App\Models\Notification;
 
 class CommentLikeController extends Controller
 {
@@ -14,6 +15,18 @@ class CommentLikeController extends Controller
             'user_id' => $request->user()->id,
             'comment_id' => $comment->id,
         ]);
+
+        if ($like->wasRecentlyCreated && $comment->user_id !== $request->user()->id) {
+            Notification::create([
+                'user_id' => $comment->user_id,
+                'type' => 'comment_like',
+                'data' => [
+                    'username' => $request->user()->profile->username ?? $request->user()->name,
+                    'comment_id' => $comment->id,
+                    'post_id' => $comment->post_id,
+                ],
+            ]);
+        }
 
         return response()->json(['liked' => true]);
     }
